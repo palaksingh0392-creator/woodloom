@@ -1,14 +1,19 @@
 .container-main {
-  width: 100%;
-  max-width: 1440px;
+  width: min(1440px, calc(100% - 64px));
 
   margin-inline: auto;
-
-  padding-inline: 24px;
 }
 
 .section-spacing {
-  padding-block: 100px;
+  padding-block: 7rem;
+}
+
+.section-tight {
+  padding-block: 4rem;
+}
+
+.section-xl {
+  padding-block: 10rem;
 }
 
 .card-surface {
@@ -16,16 +21,79 @@
 
   border: 1px solid var(--border);
 
-  border-radius: var(--radius);
+  border-radius: 28px;
+
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.03),
+    0 2px 8px rgba(0, 0, 0, 0.02);
+
+  transition:
+    transform 0.4s ease,
+    box-shadow 0.4s ease,
+    background 0.3s ease;
 }
 
-.flex-center {
-  display: flex;
+.card-hover {
+  transition:
+    transform 0.5s ease,
+    box-shadow 0.5s ease;
+}
 
-  align-items: center;
-  justify-content: center;
+.card-hover:hover {
+  transform: translateY(-6px);
+
+  box-shadow:
+    0 25px 60px rgba(0, 0, 0, 0.08),
+    0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.editorial-grid {
+  display: grid;
+
+  gap: 2rem;
 }
 
 .transition-default {
-  transition: all 0.3s ease;
+  transition: all 0.35s ease;
+}
+
+.image-hover {
+  overflow: hidden;
+}
+
+.image-hover img {
+  transition: transform 0.7s ease;
+}
+
+.image-hover:hover img {
+  transform: scale(1.04);
+}
+
+.blur-glow {
+  position: absolute;
+
+  inset: 0;
+
+  background: radial-gradient(
+    circle,
+    rgba(196, 154, 106, 0.18),
+    transparent 70%
+  );
+
+  filter: blur(60px);
+
+  pointer-events: none;
+}
+
+.editorial-divider {
+  width: 100%;
+
+  height: 1px;
+
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--border),
+    transparent
+  );
 }
