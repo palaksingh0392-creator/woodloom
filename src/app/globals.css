@@ -1,26 +1,58 @@
 @import "tailwindcss";
+@import "../styles/typography.css";
+@import "../styles/utilities.css";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* LIGHT THEME */
+
+  --background: #f7f3ee;
+  --surface: #ffffff;
+
+  --primary: #c49a6a;
+  --primary-hover: #b5895f;
+
+  --text-primary: #2a241f;
+  --text-secondary: #6f655d;
+
+  --border: #e7dfd7;
+
+  --success: #3f7d58;
+  --danger: #b85042;
+
+  --radius: 20px;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+.dark {
+  /* ESPRESSO DARK THEME */
+
+  --background: #1f1b18;
+  --surface: #2b2622;
+
+  --primary: #c49a6a;
+  --primary-hover: #ddb383;
+
+  --text-primary: #f3ede7;
+  --text-secondary: #b8ada1;
+
+  --border: #3a342f;
+
+  --success: #5f9c76;
+  --danger: #d46a5d;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  border-color: var(--border);
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   background: var(--background);
-  color: var(--foreground);
+  color: var(--text-primary);
+
   font-family: Arial, Helvetica, sans-serif;
+
+  min-height: 100vh;
 }
