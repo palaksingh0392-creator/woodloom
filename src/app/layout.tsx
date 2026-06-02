@@ -30,6 +30,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
+      data-scroll-behavior="smooth"
       className={`
         ${playfair.variable}
         ${manrope.variable}

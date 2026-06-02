@@ -1,17 +1,21 @@
-import { ReactNode } from "react";
-
+import FooterSection from "./footer";
 import Navbar from "./navbar";
+import Topbar from "./topbar";
 
-type Props = {
-  children: ReactNode;
-};
-
-export default function MainLayout({ children }: Props) {
+export default function MainLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <>
+      <Topbar />
+
       <Navbar />
 
       <main>{children}</main>
+
+      <FooterSection />
     </>
   );
 }

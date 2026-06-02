@@ -1,12 +1,18 @@
+"use client";
+
 import Link from "next/link";
 
-import { Heart, ShoppingBag, Search } from "lucide-react";
+import { Heart, Search, ShoppingBag, User } from "lucide-react";
 
 import ThemeToggle from "@/components/ui/theme-toggle";
+import { useCartCount, useWishlistCount } from "@/store/commerce-store";
 
 import Container from "../shared/container";
 
 export default function Navbar() {
+  const cartCount = useCartCount();
+  const wishlistCount = useWishlistCount();
+
   return (
     <header
       className="
@@ -14,82 +20,166 @@ export default function Navbar() {
         top-0
         z-50
 
+        bg-[var(--background)]/92
         backdrop-blur-xl
-        border-b
 
-        bg-[var(--background)]/80
+        border-b
       "
     >
       <Container>
         <div
           className="
             h-20
-            flex
+            lg:h-24
+
+            grid
+            grid-cols-[1fr_auto]
+            lg:grid-cols-3
+
             items-center
-            justify-between
+            gap-4
           "
         >
           {/* LEFT */}
-          <div className="flex items-center gap-12">
+          <div>
             <Link
               href="/"
               className="
-                text-2xl
-                font-bold
-                tracking-tight
+                flex
+                flex-col
+                leading-none
               "
             >
-              WOODLOOM
-            </Link>
-
-            <nav className="hidden lg:flex items-center gap-8">
-              <Link href="/">Home</Link>
-
-              <Link href="/shop">Shop</Link>
-
-              <Link href="/collections">Collections</Link>
-
-              <Link href="/about">About</Link>
-            </nav>
-          </div>
-
-          {/* RIGHT */}
-          <div className="flex items-center gap-4">
-            <button className="p-2">
-              <Search size={22} />
-            </button>
-
-            <button className="p-2">
-              <Heart size={22} />
-            </button>
-
-            <button className="p-2 relative">
-              <ShoppingBag size={22} />
+              <span
+                className="
+                  text-[1.5rem]
+                  sm:text-[2rem]
+                  font-bold
+                  tracking-tight
+                "
+              >
+                WOODLOOM
+              </span>
 
               <span
                 className="
-                  absolute
-                  -top-1
-                  -right-1
+                  text-[10px]
+                  tracking-[4px]
+                  uppercase
 
-                  w-5
-                  h-5
+                  text-muted
 
-                  rounded-full
-
-                  bg-[var(--primary)]
-                  text-white
-
-                  text-xs
-
-                  flex
-                  items-center
-                  justify-center
+                  mt-2
                 "
               >
-                2
+                Live Beautifully
               </span>
-            </button>
+            </Link>
+          </div>
+
+          {/* CENTER */}
+          <nav
+            className="
+              hidden
+              lg:flex
+
+              items-center
+              justify-center
+              gap-10
+            "
+          >
+            <Link href="/furniture/living-room">Living Room</Link>
+
+            <Link href="/furniture/bedroom">Bedroom</Link>
+
+            <Link href="/furniture/dining-room">Dining</Link>
+
+            <Link href="/furniture/office">Office</Link>
+
+            <Link href="/furniture/decor">Decor</Link>
+
+            <Link href="/furniture">Collections</Link>
+
+            <Link href="/blog">Blog</Link>
+          </nav>
+
+          {/* RIGHT */}
+          <div
+            className="
+              flex
+              items-center
+              justify-end
+              gap-3
+              sm:gap-5
+            "
+          >
+            <Link href="/search" aria-label="Search" className="hidden sm:block">
+              <Search size={22} />
+            </Link>
+
+            <Link href="/account" aria-label="Account" className="hidden sm:block">
+              <User size={22} />
+            </Link>
+
+            <Link href="/wishlist" aria-label="Wishlist" className="relative">
+              <Heart size={22} />
+
+              {wishlistCount > 0 && (
+                <span
+                  className="
+                    absolute
+                    -top-2
+                    -right-2
+
+                    w-5
+                    h-5
+
+                    rounded-full
+
+                    bg-[var(--primary)]
+                    text-white
+
+                    text-[10px]
+
+                    flex
+                    items-center
+                    justify-center
+                  "
+                >
+                  {wishlistCount}
+                </span>
+              )}
+            </Link>
+
+            <Link href="/cart" aria-label="Cart" className="relative">
+              <ShoppingBag size={22} />
+
+              {cartCount > 0 && (
+                <span
+                  className="
+                    absolute
+                    -top-2
+                    -right-2
+
+                    w-5
+                    h-5
+
+                    rounded-full
+
+                    bg-[var(--primary)]
+                    text-white
+
+                    text-[10px]
+
+                    flex
+                    items-center
+                    justify-center
+                  "
+                >
+                  {cartCount}
+                </span>
+              )}
+            </Link>
 
             <ThemeToggle />
           </div>

@@ -27,7 +27,7 @@ export default function ProductCard({ title, category, price, image }: Props) {
           relative
           overflow-hidden
           aspect-[4/4.8]
-          bg-[#efe7dd]
+          bg-[var(--surface-muted)]
         "
       >
         <button
@@ -42,7 +42,8 @@ export default function ProductCard({ title, category, price, image }: Props) {
 
             rounded-full
 
-            bg-white/90
+            bg-[var(--surface-overlay)]
+            text-[var(--text-primary)]
             backdrop-blur-md
 
             flex
@@ -63,6 +64,7 @@ export default function ProductCard({ title, category, price, image }: Props) {
           src={image}
           alt={title}
           fill
+          sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
           className="
             object-cover
             transition-transform

@@ -1,20 +1,33 @@
 @import "tailwindcss";
 @import "../styles/typography.css";
 @import "../styles/utilities.css";
+@import "swiper/css";
+
+@theme inline {
+  --font-sans: var(--font-body);
+  --font-serif: var(--font-heading);
+}
 
 :root {
   /* LIGHT THEME */
 
   --background: #f7f3ee;
   --surface: #ffffff;
+  --surface-muted: #efe7de;
+  --surface-soft: #f5f1eb;
+  --surface-tinted: #faecec;
+  --surface-overlay: rgba(255, 255, 255, 0.88);
+  --hero-scrim: rgba(247, 244, 239, 0.82);
 
   --primary: #c49a6a;
   --primary-hover: #b5895f;
 
   --text-primary: #2a241f;
   --text-secondary: #6f655d;
+  --text-inverse: #ffffff;
 
   --border: #e7dfd7;
+  --shadow-soft: rgba(0, 0, 0, 0.08);
 
   --success: #3f7d58;
   --danger: #b85042;
@@ -27,14 +40,21 @@
 
   --background: #1f1b18;
   --surface: #2b2622;
+  --surface-muted: #342d28;
+  --surface-soft: #26211d;
+  --surface-tinted: #312923;
+  --surface-overlay: rgba(43, 38, 34, 0.88);
+  --hero-scrim: rgba(31, 27, 24, 0.84);
 
   --primary: #c49a6a;
   --primary-hover: #ddb383;
 
   --text-primary: #f3ede7;
   --text-secondary: #b8ada1;
+  --text-inverse: #1f1b18;
 
   --border: #3a342f;
+  --shadow-soft: rgba(0, 0, 0, 0.35);
 
   --success: #5f9c76;
   --danger: #d46a5d;
@@ -46,8 +66,16 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }
 
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
 body {
   background: var(--background);
   color: var(--text-primary);
@@ -55,8 +83,32 @@ body {
   font-family: var(--font-body);
 
   min-height: 100vh;
+  overflow-x: hidden;
 
   transition:
     background 0.3s ease,
     color 0.3s ease;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-heading);
+}
+.swiper {
+  width: 100%;
+  overflow: visible !important;
+}
+
+.swiper-wrapper {
+  align-items: stretch;
+}
+
+.swiper-slide {
+  height: auto;
+  user-select: none;
+}
+
+.swiper-slide img {
+  pointer-events: none;
 }

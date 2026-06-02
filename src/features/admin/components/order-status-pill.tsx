@@ -1,0 +1,23 @@
+import type { AdminOrder } from "@/data/admin";
+
+const statusClassName: Record<AdminOrder["status"], string> = {
+  New: "bg-blue-500/10 text-blue-700 dark:text-blue-300",
+  Processing: "bg-amber-500/10 text-amber-700 dark:text-amber-300",
+  Packed: "bg-purple-500/10 text-purple-700 dark:text-purple-300",
+  Shipped: "bg-cyan-500/10 text-cyan-700 dark:text-cyan-300",
+  Delivered: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300",
+};
+
+export default function OrderStatusPill({
+  status,
+}: {
+  status: AdminOrder["status"];
+}) {
+  return (
+    <span
+      className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${statusClassName[status]}`}
+    >
+      {status}
+    </span>
+  );
+}
