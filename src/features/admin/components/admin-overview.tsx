@@ -1,22 +1,30 @@
 import Link from "next/link";
 
 import {
-  adminMetrics,
-  adminOrders,
-  customerMessages,
-  inventoryItems,
-} from "@/data/admin";
+  getAdminCustomers,
+  getAdminInventory,
+  getAdminMetrics,
+  getAdminOrders,
+} from "@/lib/admin";
 import { listCatalogProducts } from "@/lib/catalog";
 
+import AdminCustomersTable from "./admin-customers-table";
 import AdminInventoryTable from "./admin-inventory-table";
 import AdminOrdersTable from "./admin-orders-table";
 import AdminSectionCard from "./admin-section-card";
 import AdminStatCard from "./admin-stat-card";
 
 export default async function AdminOverview() {
-  const products = await listCatalogProducts();
+  const [products, adminMetrics, adminOrders, inventoryItems, customers] =
+    await Promise.all([
+      listCatalogProducts(),
+      getAdminMetrics(),
+      getAdminOrders(),
+      getAdminInventory(),
+      getAdminCustomers(),
+    ]);
   const lowStockItems = inventoryItems.filter(
-    (item) => item.stock <= item.reorderAt,
+    (item) => item.stock - item.reserved <= item.reorderAt,
   );
 
   return (
@@ -62,10 +70,10 @@ export default async function AdminOverview() {
 
             <div className="rounded-lg bg-[var(--surface-muted)] p-4">
               <p className="text-sm text-[var(--text-secondary)]">
-                Customer messages
+                Customers
               </p>
               <strong className="mt-2 block text-3xl">
-                {customerMessages.length}
+                {customers.length}
               </strong>
             </div>
           </div>
@@ -87,30 +95,8 @@ export default async function AdminOverview() {
           <AdminInventoryTable items={inventoryItems} />
         </AdminSectionCard>
 
-        <AdminSectionCard title="Customer Messages">
-          <div className="space-y-3">
-            {customerMessages.map((message) => (
-              <article
-                key={`${message.name}-${message.topic}`}
-                className="rounded-lg border p-4"
-              >
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <h3 className="font-semibold">{message.name}</h3>
-                    <p className="mt-1 text-sm text-[var(--text-secondary)]">
-                      {message.topic}
-                    </p>
-                  </div>
-                  <span className="rounded-full bg-[var(--surface-muted)] px-2.5 py-1 text-xs font-semibold">
-                    {message.priority}
-                  </span>
-                </div>
-                <p className="mt-3 text-xs text-[var(--text-secondary)]">
-                  {message.received}
-                </p>
-              </article>
-            ))}
-          </div>
+        <AdminSectionCard title="Recent Customers">
+          <AdminCustomersTable customers={customers.slice(0, 5)} />
         </AdminSectionCard>
       </div>
     </div>

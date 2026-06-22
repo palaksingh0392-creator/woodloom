@@ -29,7 +29,7 @@ export async function requireAdminSession() {
   const session = await getCurrentSession();
 
   if (!session) {
-    redirect("/login");
+    redirect("/admin-login");
   }
 
   if (!canAccessAdmin(session.role)) {

@@ -2,11 +2,33 @@ import { products } from "@/data/products";
 
 export type AdminOrder = {
   id: string;
+  databaseId?: string;
   customer: string;
+  email?: string;
+  phone?: string;
   item: string;
+  items?: {
+    productName: string;
+    sku: string;
+    quantity: number;
+    total: string;
+  }[];
+  address?: string;
   total: string;
   payment: "Paid" | "COD" | "Pending";
-  status: "New" | "Processing" | "Packed" | "Shipped" | "Delivered";
+  paymentMethod?: string;
+  paymentStatus?: string;
+  status:
+    | "Pending"
+    | "Confirmed"
+    | "Processing"
+    | "Packed"
+    | "Shipped"
+    | "Delivered"
+    | "Cancelled"
+    | "Return requested"
+    | "Returned";
+  statusCode?: string;
   date: string;
 };
 
@@ -33,7 +55,7 @@ export const adminOrders: AdminOrder[] = [
     item: "Walnut Dining Table",
     total: "Rs. 48,999",
     payment: "Paid",
-    status: "New",
+    status: "Confirmed",
     date: "Jun 01",
   },
   {

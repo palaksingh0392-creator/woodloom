@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import {
+  canAccessAdmin,
   createSessionToken,
   hasDatabaseUrl,
   sessionCookieName,
@@ -22,6 +23,7 @@ export async function POST(request: Request) {
   const body = (await request.json()) as {
     email?: string;
     password?: string;
+    portal?: "customer" | "admin";
   };
   const email = body.email?.trim().toLowerCase();
   const password = body.password ?? "";
@@ -49,6 +51,14 @@ export async function POST(request: Request) {
   }
 
   const role = user.role as UserRole;
+
+  if (body.portal === "admin" && !canAccessAdmin(role)) {
+    return NextResponse.json(
+      { message: "This account does not have admin access." },
+      { status: 403 },
+    );
+  }
+
   const response = NextResponse.json({
     user: {
       id: user.id,

@@ -41,15 +41,35 @@ export async function POST(request: Request) {
     );
   }
 
-  const order = await createAccountOrder({
-    userId: session.id,
-    items: body.items,
-    address: body.address,
-    paymentMethod: body.paymentMethod,
-    subtotal: body.subtotal,
-    deliveryCharge: body.deliveryCharge,
-    total: body.total,
-  });
+  try {
+    const order = await createAccountOrder({
+      userId: session.id,
+      items: body.items,
+      address: body.address,
+      addressId: body.addressId,
+      paymentMethod: body.paymentMethod,
+    });
 
-  return NextResponse.json({ order }, { status: 201 });
+    return NextResponse.json(
+      {
+        order: order
+          ? {
+              orderNumber: order.orderNumber,
+              subtotal: Number(order.subtotal),
+              deliveryCharge: Number(order.shippingFee),
+              total: Number(order.total),
+            }
+          : null,
+      },
+      { status: 201 },
+    );
+  } catch (error) {
+    return NextResponse.json(
+      {
+        message:
+          error instanceof Error ? error.message : "Unable to create order.",
+      },
+      { status: 400 },
+    );
+  }
 }

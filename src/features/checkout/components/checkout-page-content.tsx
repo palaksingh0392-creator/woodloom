@@ -3,10 +3,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { FormEvent, useMemo, useState } from "react";
 
 import { CheckCircle2, CreditCard, MapPin, ShieldCheck } from "lucide-react";
 
+import type { Product } from "@/data/products";
+import type { AccountAddress } from "@/lib/account";
 import {
   calculateCartTotals,
   commerceActions,
@@ -26,10 +28,28 @@ const emptyAddress: CheckoutAddress = {
   pincode: "",
 };
 
-export default function CheckoutPageContent() {
+export default function CheckoutPageContent({
+  products,
+  savedAddresses,
+}: {
+  products: Product[];
+  savedAddresses: AccountAddress[];
+}) {
   const router = useRouter();
   const cartItems = useCommerceSelector((state) => state.cartItems);
-  const totals = calculateCartTotals(cartItems);
+  const pricedCartItems = useMemo(() => {
+    const productBySlug = new Map(
+      products.map((product) => [product.slug, product]),
+    );
+
+    return cartItems.map((item) => ({
+      ...item,
+      price: productBySlug.get(item.productSlug)?.price ?? item.price,
+    }));
+  }, [cartItems, products]);
+  const totals = calculateCartTotals(pricedCartItems);
+  const defaultAddressId = savedAddresses[0]?.id ?? "new";
+  const [selectedAddressId, setSelectedAddressId] = useState(defaultAddressId);
   const [address, setAddress] = useState(emptyAddress);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("cod");
   const [message, setMessage] = useState("");
@@ -52,9 +72,23 @@ export default function CheckoutPageContent() {
     setMessage("");
     setIsSubmitting(true);
 
+    const selectedSavedAddress = savedAddresses.find(
+      (savedAddress) => savedAddress.id === selectedAddressId,
+    );
+    const orderAddress = selectedSavedAddress
+      ? {
+          fullName: selectedSavedAddress.fullName,
+          phone: selectedSavedAddress.phone,
+          addressLine1: selectedSavedAddress.line1,
+          addressLine2: selectedSavedAddress.line2,
+          city: selectedSavedAddress.city,
+          state: selectedSavedAddress.state,
+          pincode: selectedSavedAddress.postalCode,
+        }
+      : address;
     const localOrder = {
-      items: cartItems,
-      address,
+      items: pricedCartItems,
+      address: orderAddress,
       paymentMethod,
       subtotal: totals.subtotal,
       deliveryCharge: totals.deliveryCharge,
@@ -65,28 +99,43 @@ export default function CheckoutPageContent() {
       const response = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(localOrder),
+        body: JSON.stringify({
+          ...localOrder,
+          addressId: selectedSavedAddress?.id,
+          address: selectedSavedAddress ? undefined : address,
+        }),
       });
 
-      if (response.ok) {
-        const data = (await response.json()) as {
-          order?: { orderNumber?: string };
+      const data = (await response.json()) as {
+        message?: string;
+        order?: {
+          orderNumber?: string;
+          subtotal?: number;
+          deliveryCharge?: number;
+          total?: number;
         };
-        commerceActions.placeOrder({
-          ...localOrder,
-          orderNumber: data.order?.orderNumber,
-        });
-        router.push("/checkout/success");
+      };
+
+      if (!response.ok || !data.order) {
+        setMessage(data.message ?? "Unable to place this order.");
+        setIsSubmitting(false);
         return;
       }
+
+      commerceActions.placeOrder({
+        ...localOrder,
+        subtotal: data.order.subtotal ?? totals.subtotal,
+        deliveryCharge:
+          data.order.deliveryCharge ?? totals.deliveryCharge,
+        total: data.order.total ?? totals.total,
+        orderNumber: data.order.orderNumber,
+      });
+      router.push("/checkout/success");
     } catch {
-      setMessage("Using local order capture because the server is unavailable.");
+      setMessage("The order server is unavailable. Please try again.");
+      setIsSubmitting(false);
     }
 
-    commerceActions.placeOrder(localOrder);
-    setIsSubmitting(false);
-
-    router.push("/checkout/success");
   };
 
   if (cartItems.length === 0) {
@@ -152,7 +201,91 @@ export default function CheckoutPageContent() {
               <h2 className="text-3xl font-serif">Delivery Address</h2>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-5">
+            {savedAddresses.length > 0 ? (
+              <div className="mb-6 grid gap-4 md:grid-cols-2">
+                {savedAddresses.map((savedAddress) => (
+                  <label
+                    key={savedAddress.id}
+                    className={`
+                      cursor-pointer
+                      rounded-[22px]
+                      border
+                      p-5
+                      transition
+                      ${
+                        selectedAddressId === savedAddress.id
+                          ? "border-[var(--primary)] bg-[var(--surface-muted)]"
+                          : "border-[var(--border)]"
+                      }
+                    `}
+                  >
+                    <div className="mb-3 flex items-start justify-between gap-4">
+                      <span>
+                        <span className="block font-semibold">
+                          {savedAddress.fullName}
+                        </span>
+                        <span className="text-sm text-[var(--text-secondary)]">
+                          {savedAddress.phone}
+                        </span>
+                      </span>
+                      <input
+                        type="radio"
+                        name="savedAddress"
+                        checked={selectedAddressId === savedAddress.id}
+                        onChange={() => setSelectedAddressId(savedAddress.id)}
+                        className="mt-1 accent-[var(--primary)]"
+                      />
+                    </div>
+                    <p className="text-sm leading-relaxed text-[var(--text-secondary)]">
+                      {savedAddress.line1}
+                      {savedAddress.line2 ? `, ${savedAddress.line2}` : ""}
+                      <br />
+                      {savedAddress.city}, {savedAddress.state}{" "}
+                      {savedAddress.postalCode}
+                    </p>
+                    {savedAddress.isDefault ? (
+                      <span className="mt-4 inline-flex rounded-full bg-[var(--primary)] px-3 py-1 text-xs uppercase tracking-[2px] text-white">
+                        Default
+                      </span>
+                    ) : null}
+                  </label>
+                ))}
+
+                <label
+                  className={`
+                    cursor-pointer
+                    rounded-[22px]
+                    border
+                    p-5
+                    transition
+                    ${
+                      selectedAddressId === "new"
+                        ? "border-[var(--primary)] bg-[var(--surface-muted)]"
+                        : "border-[var(--border)]"
+                    }
+                  `}
+                >
+                  <div className="flex items-center justify-between gap-4">
+                    <span>
+                      <span className="block font-semibold">Use a new address</span>
+                      <span className="text-sm text-[var(--text-secondary)]">
+                        This will be saved for next time.
+                      </span>
+                    </span>
+                    <input
+                      type="radio"
+                      name="savedAddress"
+                      checked={selectedAddressId === "new"}
+                      onChange={() => setSelectedAddressId("new")}
+                      className="accent-[var(--primary)]"
+                    />
+                  </div>
+                </label>
+              </div>
+            ) : null}
+
+            {selectedAddressId === "new" ? (
+              <div className="grid md:grid-cols-2 gap-5">
               <input
                 required
                 value={address.fullName}
@@ -216,6 +349,7 @@ export default function CheckoutPageContent() {
                 className="h-14 rounded-full border border-[var(--border)] bg-transparent px-5 outline-none focus:border-[var(--primary)]"
               />
             </div>
+            ) : null}
           </section>
 
           <section
@@ -314,7 +448,7 @@ export default function CheckoutPageContent() {
           </div>
 
           <div className="grid gap-5 mb-8">
-            {cartItems.map((item) => (
+            {pricedCartItems.map((item) => (
               <div
                 key={`${item.productSlug}-${item.finish}`}
                 className="grid grid-cols-[72px_1fr] gap-4"

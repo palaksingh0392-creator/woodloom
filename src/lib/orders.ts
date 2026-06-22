@@ -2,6 +2,7 @@ import "server-only";
 
 import type { CartItem, CheckoutAddress, PaymentMethod } from "@/store/commerce-store";
 import { hasDatabaseUrl } from "@/lib/auth";
+import { reserveOrderInventory } from "@/lib/inventory";
 import { prisma } from "@/lib/prisma";
 
 export type AccountOrder = {
@@ -25,16 +26,10 @@ export type AccountOrder = {
 export type CreateOrderInput = {
   userId: string;
   items: CartItem[];
-  address: CheckoutAddress;
+  address?: CheckoutAddress;
+  addressId?: string;
   paymentMethod: PaymentMethod;
-  subtotal: number;
-  deliveryCharge: number;
-  total: number;
 };
-
-function parsePrice(price: string) {
-  return Number(price.replace(/[^\d.]/g, ""));
-}
 
 function createOrderNumber() {
   return `WL-${Date.now().toString().slice(-8)}`;
@@ -45,78 +40,125 @@ export async function createAccountOrder(input: CreateOrderInput) {
     return null;
   }
 
-  const products = await prisma.product.findMany({
-    where: {
-      slug: {
-        in: input.items.map((item) => item.productSlug),
-      },
-    },
-    include: {
-      variants: true,
-    },
-  });
-
-  const productBySlug = new Map(products.map((product) => [product.slug, product]));
-
-  const shippingAddress = await prisma.address.create({
-    data: {
-      userId: input.userId,
-      type: "HOME",
-      fullName: input.address.fullName,
-      phone: input.address.phone,
-      line1: input.address.addressLine1,
-      line2: input.address.addressLine2 || null,
-      city: input.address.city,
-      state: input.address.state,
-      postalCode: input.address.pincode,
-    },
-  });
-
-  return prisma.order.create({
-    data: {
-      orderNumber: createOrderNumber(),
-      userId: input.userId,
-      shippingAddressId: shippingAddress.id,
-      status: "CONFIRMED",
-      paymentStatus: input.paymentMethod === "cod" ? "PENDING" : "AUTHORIZED",
-      subtotal: input.subtotal,
-      shippingFee: input.deliveryCharge,
-      total: input.total,
-      items: {
-        create: input.items.map((item) => {
-          const product = productBySlug.get(item.productSlug);
-          const variant = product?.variants.find(
-            (currentVariant) => currentVariant.finish === item.finish,
-          );
-          const unitPrice = parsePrice(item.price);
-
-          if (!product) {
-            throw new Error(`Product not found: ${item.productSlug}`);
-          }
-
-          return {
-            productId: product.id,
-            variantId: variant?.id,
-            productName: item.title,
-            sku: variant?.sku ?? product.sku,
-            quantity: item.quantity,
-            unitPrice,
-            total: unitPrice * item.quantity,
-          };
-        }),
-      },
-      payment: {
-        create: {
-          method: input.paymentMethod === "cod" ? "COD" : "RAZORPAY",
-          status: input.paymentMethod === "cod" ? "PENDING" : "AUTHORIZED",
-          amount: input.total,
+  return prisma.$transaction(async (transaction) => {
+    const products = await transaction.product.findMany({
+      where: {
+        slug: {
+          in: input.items.map((item) => item.productSlug),
         },
       },
-    },
-    include: {
-      items: true,
-      payment: true,
-    },
+      include: {
+        variants: true,
+      },
+    });
+
+    const productBySlug = new Map(
+      products.map((product) => [product.slug, product]),
+    );
+    const orderItems = input.items.map((item) => {
+      const product = productBySlug.get(item.productSlug);
+
+      if (!product) {
+        throw new Error(`Product not found: ${item.productSlug}`);
+      }
+
+      if (!Number.isInteger(item.quantity) || item.quantity < 1) {
+        throw new Error(`Invalid quantity for ${product.name}`);
+      }
+
+      const variant = product.variants.find(
+        (currentVariant) => currentVariant.finish === item.finish,
+      );
+
+      if (!variant) {
+        throw new Error(`Finish not found for ${product.name}`);
+      }
+
+      const availableStock = variant.stock - variant.reserved;
+
+      if (item.quantity > availableStock) {
+        throw new Error(`Only ${availableStock} units available for ${product.name}`);
+      }
+
+      const unitPrice = Number(product.price);
+
+      return {
+        productId: product.id,
+        variantId: variant.id,
+        productName: product.name,
+        sku: variant.sku,
+        quantity: item.quantity,
+        unitPrice,
+        total: unitPrice * item.quantity,
+      };
+    });
+    const subtotal = orderItems.reduce((sum, item) => sum + item.total, 0);
+    const shippingFee = subtotal >= 50000 ? 0 : 999;
+    const total = subtotal + shippingFee;
+
+    let shippingAddress = input.addressId
+      ? await transaction.address.findFirst({
+          where: {
+            id: input.addressId,
+            userId: input.userId,
+          },
+        })
+      : null;
+
+    if (!shippingAddress && input.address) {
+      await transaction.address.updateMany({
+        where: { userId: input.userId },
+        data: { isDefault: false },
+      });
+
+      shippingAddress = await transaction.address.create({
+        data: {
+          userId: input.userId,
+          type: "HOME",
+          fullName: input.address.fullName,
+          phone: input.address.phone,
+          line1: input.address.addressLine1,
+          line2: input.address.addressLine2 || null,
+          city: input.address.city,
+          state: input.address.state,
+          postalCode: input.address.pincode,
+          isDefault: true,
+        },
+      });
+    }
+
+    if (!shippingAddress) {
+      throw new Error("Choose or add a delivery address.");
+    }
+
+    await reserveOrderInventory(transaction, orderItems);
+
+    return transaction.order.create({
+      data: {
+        orderNumber: createOrderNumber(),
+        userId: input.userId,
+        shippingAddressId: shippingAddress.id,
+        status: "CONFIRMED",
+        paymentStatus: input.paymentMethod === "cod" ? "PENDING" : "AUTHORIZED",
+        subtotal,
+        shippingFee,
+        total,
+        items: {
+          create: orderItems,
+        },
+        payment: {
+          create: {
+            method: input.paymentMethod === "cod" ? "COD" : "RAZORPAY",
+            status: input.paymentMethod === "cod" ? "PENDING" : "AUTHORIZED",
+            amount: total,
+          },
+        },
+      },
+      include: {
+        items: true,
+        payment: true,
+      },
+    });
   });
 }
 

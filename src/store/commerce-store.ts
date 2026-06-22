@@ -217,11 +217,9 @@ export function calculateCartTotals(cartItems: CartItem[]) {
 }
 
 export function formatPrice(value: number) {
-  return new Intl.NumberFormat("en-IN", {
-    style: "currency",
-    currency: "INR",
+  return `Rs. ${new Intl.NumberFormat("en-IN", {
     maximumFractionDigits: 0,
-  }).format(value);
+  }).format(value)}`;
 }
 
 function parsePrice(price: string) {

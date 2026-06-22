@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 
-import { Heart, Search, ShoppingBag, User } from "lucide-react";
+import { Heart, Search, ShieldCheck, ShoppingBag, User } from "lucide-react";
 
 import ThemeToggle from "@/components/ui/theme-toggle";
 import { useCartCount, useWishlistCount } from "@/store/commerce-store";
@@ -88,7 +88,7 @@ export default function Navbar() {
               gap-10
             "
           >
-            <Link href="/furniture/living-room">Living Room</Link>
+            <Link href="/furniture/living-room">LivingRoom</Link>
 
             <Link href="/furniture/bedroom">Bedroom</Link>
 
@@ -101,6 +101,8 @@ export default function Navbar() {
             <Link href="/furniture">Collections</Link>
 
             <Link href="/blog">Blog</Link>
+
+            <Link href="/admin-login">Admin</Link>
           </nav>
 
           {/* RIGHT */}
@@ -113,12 +115,24 @@ export default function Navbar() {
               sm:gap-5
             "
           >
-            <Link href="/search" aria-label="Search" className="hidden sm:block">
+            <Link
+              href="/search"
+              aria-label="Search"
+              className="hidden sm:block"
+            >
               <Search size={22} />
             </Link>
 
-            <Link href="/account" aria-label="Account" className="hidden sm:block">
+            <Link
+              href="/account"
+              aria-label="Account"
+              className="hidden sm:block"
+            >
               <User size={22} />
+            </Link>
+
+            <Link href="/admin-login" aria-label="Admin login" title="Admin login">
+              <ShieldCheck size={22} />
             </Link>
 
             <Link href="/wishlist" aria-label="Wishlist" className="relative">

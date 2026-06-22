@@ -20,7 +20,8 @@ export default function AdminInventoryTable({
 
         <tbody>
           {items.map((item) => {
-            const isLow = item.stock <= item.reorderAt;
+            const available = item.stock - item.reserved;
+            const isLow = available <= item.reorderAt;
 
             return (
               <tr key={item.sku} className="border-b last:border-b-0">
@@ -38,7 +39,10 @@ export default function AdminInventoryTable({
                         : "font-semibold"
                     }
                   >
-                    {item.stock}
+                    {available}
+                  </span>
+                  <span className="ml-2 text-xs text-[var(--text-secondary)]">
+                    of {item.stock}
                   </span>
                 </td>
               </tr>

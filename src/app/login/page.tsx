@@ -7,7 +7,16 @@ export const metadata = {
   description: "Login to your WOODLOOM account.",
 };
 
-export default function LoginPage() {
+type LoginPageProps = {
+  searchParams: Promise<{
+    next?: string;
+  }>;
+};
+
+export default async function LoginPage({ searchParams }: LoginPageProps) {
+  const { next } = await searchParams;
+  const redirectTo = next?.startsWith("/") ? next : undefined;
+
   return (
     <MainLayout>
       <AuthCard
@@ -18,7 +27,7 @@ export default function LoginPage() {
         footerHref="/register"
         footerLabel="Create an account"
       >
-        <LoginForm />
+        <LoginForm redirectTo={redirectTo} />
       </AuthCard>
     </MainLayout>
   );

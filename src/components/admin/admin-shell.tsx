@@ -2,9 +2,11 @@ import Link from "next/link";
 
 import {
   Boxes,
+  Layers,
   LayoutDashboard,
   PackageCheck,
   ShoppingBag,
+  Tags,
   Users,
 } from "lucide-react";
 
@@ -12,6 +14,8 @@ const adminLinks = [
   { href: "/admin", label: "Overview", icon: LayoutDashboard },
   { href: "/admin/orders", label: "Orders", icon: ShoppingBag },
   { href: "/admin/products", label: "Products", icon: PackageCheck },
+  { href: "/admin/categories", label: "Categories", icon: Tags },
+  { href: "/admin/collections", label: "Collections", icon: Layers },
   { href: "/admin/inventory", label: "Inventory", icon: Boxes },
   { href: "/admin/customers", label: "Customers", icon: Users },
 ];

@@ -6,7 +6,15 @@ import { FormEvent, useState } from "react";
 
 import AuthField from "./auth-field";
 
-export default function LoginForm() {
+type LoginFormProps = {
+  portal?: "customer" | "admin";
+  redirectTo?: string;
+};
+
+export default function LoginForm({
+  portal = "customer",
+  redirectTo,
+}: LoginFormProps) {
   const router = useRouter();
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -23,9 +31,13 @@ export default function LoginForm() {
       body: JSON.stringify({
         email: formData.get("email"),
         password: formData.get("password"),
+        portal,
       }),
     });
-    const data = (await response.json()) as { message?: string };
+    const data = (await response.json()) as {
+      message?: string;
+      user?: { role?: string };
+    };
 
     setIsSubmitting(false);
 
@@ -34,7 +46,13 @@ export default function LoginForm() {
       return;
     }
 
-    router.push("/account");
+    const destination =
+      redirectTo ??
+      (data.user?.role === "ADMIN" || data.user?.role === "STAFF"
+        ? "/admin"
+        : "/account");
+
+    router.push(destination);
     router.refresh();
   }
 
