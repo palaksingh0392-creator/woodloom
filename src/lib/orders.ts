@@ -2,7 +2,10 @@ import "server-only";
 
 import type { CartItem, CheckoutAddress, PaymentMethod } from "@/store/commerce-store";
 import { hasDatabaseUrl } from "@/lib/auth";
-import { reserveOrderInventory } from "@/lib/inventory";
+import {
+  applyOrderInventoryTransition,
+  reserveOrderInventory,
+} from "@/lib/inventory";
 import { prisma } from "@/lib/prisma";
 
 export type AccountOrder = {
@@ -14,6 +17,11 @@ export type AccountOrder = {
   shippingFee: number;
   total: number;
   createdAt: string;
+  returnRequest?: {
+    status: string;
+    reason: string;
+    notes: string;
+  } | null;
   items: {
     productName: string;
     sku: string;
@@ -172,6 +180,7 @@ export async function listAccountOrders(userId: string): Promise<AccountOrder[]>
     include: {
       items: true,
       payment: true,
+      returnRequest: true,
     },
     orderBy: { createdAt: "desc" },
   });
@@ -185,6 +194,13 @@ export async function listAccountOrders(userId: string): Promise<AccountOrder[]>
     shippingFee: Number(order.shippingFee),
     total: Number(order.total),
     createdAt: order.createdAt.toISOString(),
+    returnRequest: order.returnRequest
+      ? {
+          status: order.returnRequest.status,
+          reason: order.returnRequest.reason,
+          notes: order.returnRequest.notes ?? "",
+        }
+      : null,
     items: order.items.map((item) => ({
       productName: item.productName,
       sku: item.sku,
@@ -193,4 +209,88 @@ export async function listAccountOrders(userId: string): Promise<AccountOrder[]>
       total: Number(item.total),
     })),
   }));
+}
+
+export async function cancelAccountOrder(userId: string, orderNumber: string) {
+  return prisma.$transaction(async (transaction) => {
+    const order = await transaction.order.findFirst({
+      where: { userId, orderNumber },
+      include: { items: true },
+    });
+
+    if (!order) {
+      throw new Error("Order not found.");
+    }
+
+    if (["DELIVERED", "CANCELLED", "RETURN_REQUESTED", "RETURNED"].includes(order.status)) {
+      throw new Error("This order can no longer be cancelled.");
+    }
+
+    await applyOrderInventoryTransition(
+      transaction,
+      order.items,
+      order.status,
+      "CANCELLED",
+    );
+
+    return transaction.order.update({
+      where: { id: order.id },
+      data: { status: "CANCELLED" },
+    });
+  });
+}
+
+export async function requestAccountReturn(input: {
+  userId: string;
+  orderNumber: string;
+  reason: string;
+  notes?: string;
+}) {
+  const reason = input.reason.trim();
+
+  if (!reason) {
+    throw new Error("Return reason is required.");
+  }
+
+  return prisma.$transaction(async (transaction) => {
+    const order = await transaction.order.findFirst({
+      where: { userId: input.userId, orderNumber: input.orderNumber },
+      include: { items: true, returnRequest: true },
+    });
+
+    if (!order) {
+      throw new Error("Order not found.");
+    }
+
+    if (order.status !== "DELIVERED") {
+      throw new Error("Only delivered orders can be returned.");
+    }
+
+    if (order.returnRequest) {
+      throw new Error("A return request already exists for this order.");
+    }
+
+    await applyOrderInventoryTransition(
+      transaction,
+      order.items,
+      order.status,
+      "RETURN_REQUESTED",
+    );
+
+    const updatedOrder = await transaction.order.update({
+      where: { id: order.id },
+      data: { status: "RETURN_REQUESTED" },
+    });
+
+    await transaction.returnRequest.create({
+      data: {
+        orderId: order.id,
+        status: "REQUESTED",
+        reason,
+        notes: input.notes?.trim() || null,
+      },
+    });
+
+    return updatedOrder;
+  });
 }

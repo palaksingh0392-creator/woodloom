@@ -101,8 +101,6 @@ export default function Navbar() {
             <Link href="/furniture">Collections</Link>
 
             <Link href="/blog">Blog</Link>
-
-            <Link href="/admin-login">Admin</Link>
           </nav>
 
           {/* RIGHT */}
@@ -131,7 +129,11 @@ export default function Navbar() {
               <User size={22} />
             </Link>
 
-            <Link href="/admin-login" aria-label="Admin login" title="Admin login">
+            <Link
+              href="/admin-login"
+              aria-label="Admin login"
+              title="Admin login"
+            >
               <ShieldCheck size={22} />
             </Link>
 

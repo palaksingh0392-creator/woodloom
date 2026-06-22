@@ -12,6 +12,20 @@ export function isCloudinaryConfigured() {
   );
 }
 
+export function canUseLocalUploads() {
+  if (process.env.CLOUDINARY_UPLOAD_MODE === "local") return true;
+  if (process.env.CLOUDINARY_UPLOAD_MODE === "cloudinary") return false;
+  if (process.env.VERCEL === "1") return false;
+
+  return process.env.NODE_ENV !== "production";
+}
+
+export function getUploadMode() {
+  if (isCloudinaryConfigured()) return "cloudinary";
+  if (canUseLocalUploads()) return "local";
+  return "unconfigured";
+}
+
 export async function uploadProductImage(file: File) {
   const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
   const apiKey = process.env.CLOUDINARY_API_KEY;
@@ -64,6 +78,12 @@ function getFileExtension(file: File) {
 }
 
 export async function uploadLocalProductImage(file: File) {
+  if (!canUseLocalUploads()) {
+    throw new Error(
+      "Cloudinary is required for this environment. Add Cloudinary keys before uploading images.",
+    );
+  }
+
   const uploadDir = path.join(process.cwd(), "public", "uploads", "products");
   const fileName = `${Date.now()}-${randomUUID()}.${getFileExtension(file)}`;
   const filePath = path.join(uploadDir, fileName);

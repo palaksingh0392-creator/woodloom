@@ -79,27 +79,13 @@ function sign(value: string) {
   return createHmac("sha256", getAuthSecret()).update(value).digest("base64url");
 }
 
-export const sessionCookieName = "woodloom_session";
-
-export type SessionPayload = AuthUser & {
-  expiresAt: number;
-};
-
-export function createSessionToken(user: AuthUser) {
-  const payload = base64UrlEncode(
-    JSON.stringify({
-      ...user,
-      expiresAt: Date.now() + 1000 * 60 * 60 * 24 * 7,
-    } satisfies SessionPayload),
-  );
-
-  return `${payload}.${sign(payload)}`;
+export function createSignedToken<T extends object>(payload: T) {
+  const encoded = base64UrlEncode(JSON.stringify(payload));
+  return `${encoded}.${sign(encoded)}`;
 }
 
-export function verifySessionToken(token?: string) {
-  if (!token) {
-    return null;
-  }
+export function verifySignedToken<T extends object>(token?: string) {
+  if (!token) return null;
 
   const [payload, signature] = token.split(".");
 
@@ -108,14 +94,31 @@ export function verifySessionToken(token?: string) {
   }
 
   try {
-    const session = JSON.parse(base64UrlDecode(payload)) as SessionPayload;
-
-    if (session.expiresAt < Date.now()) {
-      return null;
-    }
-
-    return session;
+    return JSON.parse(base64UrlDecode(payload)) as T;
   } catch {
     return null;
   }
+}
+
+export const sessionCookieName = "woodloom_session";
+
+export type SessionPayload = AuthUser & {
+  expiresAt: number;
+};
+
+export function createSessionToken(user: AuthUser) {
+  return createSignedToken({
+      ...user,
+      expiresAt: Date.now() + 1000 * 60 * 60 * 24 * 7,
+    } satisfies SessionPayload);
+}
+
+export function verifySessionToken(token?: string) {
+  const session = verifySignedToken<SessionPayload>(token);
+
+  if (!session || session.expiresAt < Date.now()) {
+    return null;
+  }
+
+  return session;
 }

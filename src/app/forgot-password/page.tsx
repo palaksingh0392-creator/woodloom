@@ -1,6 +1,6 @@
 import MainLayout from "@/components/layout/main-layout";
 import AuthCard from "@/features/auth/components/auth-card";
-import AuthField from "@/features/auth/components/auth-field";
+import ForgotPasswordForm from "@/features/auth/components/forgot-password-form";
 
 export const metadata = {
   title: "Forgot Password | WOODLOOM",
@@ -18,22 +18,7 @@ export default function ForgotPasswordPage() {
         footerHref="/login"
         footerLabel="Back to login"
       >
-        <form className="grid gap-5">
-          <AuthField
-            id="email"
-            label="Email address"
-            type="email"
-            placeholder="you@example.com"
-            required
-          />
-
-          <button
-            type="button"
-            className="h-14 rounded-full bg-[var(--primary)] px-8 text-sm uppercase tracking-[2px] text-white"
-          >
-            Send Reset Link
-          </button>
-        </form>
+        <ForgotPasswordForm />
       </AuthCard>
     </MainLayout>
   );

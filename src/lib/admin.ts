@@ -62,6 +62,7 @@ export async function getAdminOrders(): Promise<AdminOrder[]> {
         items: true,
         payment: true,
         shippingAddress: true,
+        returnRequest: true,
       },
       orderBy: { createdAt: "desc" },
       take: 50,
@@ -98,6 +99,13 @@ export async function getAdminOrders(): Promise<AdminOrder[]> {
       payment: mapPayment(order.payment?.method, order.paymentStatus),
       paymentMethod: order.payment?.method ?? "Not recorded",
       paymentStatus: order.paymentStatus,
+      returnRequest: order.returnRequest
+        ? {
+            status: order.returnRequest.status,
+            reason: order.returnRequest.reason,
+            notes: order.returnRequest.notes ?? "",
+          }
+        : null,
       status: mapOrderStatus(order.status),
       statusCode: order.status,
       date: order.createdAt.toLocaleDateString("en-IN", {

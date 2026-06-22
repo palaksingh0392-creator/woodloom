@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import {
   Boxes,
+  FileText,
   Layers,
   LayoutDashboard,
   PackageCheck,
@@ -16,6 +17,7 @@ const adminLinks = [
   { href: "/admin/products", label: "Products", icon: PackageCheck },
   { href: "/admin/categories", label: "Categories", icon: Tags },
   { href: "/admin/collections", label: "Collections", icon: Layers },
+  { href: "/admin/blogs", label: "Blogs", icon: FileText },
   { href: "/admin/inventory", label: "Inventory", icon: Boxes },
   { href: "/admin/customers", label: "Customers", icon: Users },
 ];

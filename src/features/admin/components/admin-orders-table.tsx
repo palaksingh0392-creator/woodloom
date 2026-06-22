@@ -213,6 +213,19 @@ function OrderRows({
                 <Detail label="Phone" value={order.phone ?? "Not provided"} />
                 <Detail label="Payment method" value={order.paymentMethod ?? "Not recorded"} />
                 <Detail label="Shipping address" value={order.address ?? "Not provided"} />
+                {order.returnRequest ? (
+                  <div className="rounded-md border border-[var(--border)] bg-[var(--surface)] p-3">
+                    <Detail
+                      label="Return request"
+                      value={`${order.returnRequest.status}: ${order.returnRequest.reason}`}
+                    />
+                    {order.returnRequest.notes ? (
+                      <p className="mt-2 text-sm text-[var(--text-secondary)]">
+                        {order.returnRequest.notes}
+                      </p>
+                    ) : null}
+                  </div>
+                ) : null}
               </div>
 
               <div>

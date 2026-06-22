@@ -3,7 +3,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import MainLayout from "@/components/layout/main-layout";
-import { blogPosts, getBlogPostBySlug } from "@/data/blogs";
+import { blogPosts } from "@/data/blogs";
+import {
+  getPublishedBlogPostBySlug,
+  listPublishedBlogPosts,
+} from "@/lib/blogs";
 
 type BlogPostPageProps = {
   params: Promise<{
@@ -19,7 +23,7 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: BlogPostPageProps) {
   const { slug } = await params;
-  const post = getBlogPostBySlug(slug);
+  const post = await getPublishedBlogPostBySlug(slug);
 
   if (!post) {
     return {
@@ -35,13 +39,16 @@ export async function generateMetadata({ params }: BlogPostPageProps) {
 
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const { slug } = await params;
-  const post = getBlogPostBySlug(slug);
+  const [post, posts] = await Promise.all([
+    getPublishedBlogPostBySlug(slug),
+    listPublishedBlogPosts(),
+  ]);
 
   if (!post) {
     notFound();
   }
 
-  const relatedPosts = blogPosts
+  const relatedPosts = posts
     .filter((relatedPost) => relatedPost.slug !== post.slug)
     .slice(0, 3);
 

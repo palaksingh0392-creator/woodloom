@@ -84,6 +84,20 @@ export async function PATCH(request: Request, context: RouteContext) {
         });
       }
 
+      if (status === "RETURNED") {
+        await transaction.returnRequest.updateMany({
+          where: { orderId: id },
+          data: { status: "APPROVED" },
+        });
+      }
+
+      if (status === "CANCELLED" && currentOrder.status === "RETURN_REQUESTED") {
+        await transaction.returnRequest.updateMany({
+          where: { orderId: id },
+          data: { status: "REJECTED" },
+        });
+      }
+
       return updatedOrder;
     });
 

@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import MainLayout from "@/components/layout/main-layout";
-import { blogPosts } from "@/data/blogs";
+import { listPublishedBlogPosts } from "@/lib/blogs";
 
 export const metadata = {
   title: "Journal | WOODLOOM",
@@ -10,9 +10,9 @@ export const metadata = {
     "Read furniture buying guides, Scandinavian interior ideas, and room styling inspiration from WOODLOOM.",
 };
 
-const categories = Array.from(new Set(blogPosts.map((post) => post.category)));
-
-export default function BlogPage() {
+export default async function BlogPage() {
+  const blogPosts = await listPublishedBlogPosts();
+  const categories = Array.from(new Set(blogPosts.map((post) => post.category)));
   const featuredPost = blogPosts[0];
   const remainingPosts = blogPosts.slice(1);
 

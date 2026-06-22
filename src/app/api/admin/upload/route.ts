@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 import { canAccessAdmin } from "@/lib/auth";
 import {
-  isCloudinaryConfigured,
+  getUploadMode,
   uploadLocalProductImage,
   uploadProductImage,
 } from "@/lib/cloudinary";
@@ -36,12 +36,28 @@ export async function POST(request: Request) {
   }
 
   try {
-    const url = isCloudinaryConfigured()
+    const mode = getUploadMode();
+
+    if (mode === "unconfigured") {
+      return NextResponse.json(
+        {
+          message:
+            "Cloudinary is required in this environment. Add Cloudinary keys before uploading images.",
+        },
+        { status: 503 },
+      );
+    }
+
+    const url = mode === "cloudinary"
       ? await uploadProductImage(file)
       : await uploadLocalProductImage(file);
 
     return NextResponse.json({
-      storage: isCloudinaryConfigured() ? "cloudinary" : "local",
+      message:
+        mode === "cloudinary"
+          ? "Image uploaded to Cloudinary."
+          : "Image saved locally for development.",
+      storage: mode,
       url,
     });
   } catch (error) {

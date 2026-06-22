@@ -18,6 +18,11 @@ export type AdminOrder = {
   payment: "Paid" | "COD" | "Pending";
   paymentMethod?: string;
   paymentStatus?: string;
+  returnRequest?: {
+    status: string;
+    reason: string;
+    notes: string;
+  } | null;
   status:
     | "Pending"
     | "Confirmed"
