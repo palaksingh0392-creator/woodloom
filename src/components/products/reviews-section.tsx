@@ -1,277 +1,246 @@
 "use client";
 
-import { Star, ChevronRight } from "lucide-react";
+import Link from "next/link";
+import { FormEvent, useMemo, useState } from "react";
 
-const reviews = [
+import { Star } from "lucide-react";
+
+import type { ProductReview } from "@/lib/reviews";
+
+const fallbackReviews: ProductReview[] = [
   {
-    name: "Sophia Bennett",
-    role: "Interior Designer",
-    review:
+    id: "fallback-sophia",
+    customerName: "Sophia Bennett",
+    rating: 5,
+    title: "Interior Designer",
+    content:
       "The craftsmanship is exceptional. The wood texture, finish, and comfort feel incredibly premium and timeless.",
-
-    rating: 5,
+    createdAt: new Date("2024-05-15").toISOString(),
   },
-
   {
-    name: "Daniel Carter",
-    role: "Architect",
-    review:
+    id: "fallback-daniel",
+    customerName: "Daniel Carter",
+    rating: 5,
+    title: "Architect",
+    content:
       "Beautiful Scandinavian aesthetic. It instantly elevated the atmosphere of our living room.",
-
-    rating: 5,
+    createdAt: new Date("2024-05-18").toISOString(),
   },
-
   {
-    name: "Emma Wilson",
-    role: "Home Stylist",
-    review:
-      "Luxury quality with minimalist elegance. The delivery and packaging experience was also excellent.",
-
+    id: "fallback-emma",
+    customerName: "Emma Wilson",
     rating: 5,
+    title: "Home Stylist",
+    content:
+      "Luxury quality with minimalist elegance. The delivery and packaging experience was also excellent.",
+    createdAt: new Date("2024-05-22").toISOString(),
   },
 ];
 
-export default function ReviewsSection() {
+type ReviewsSectionProps = {
+  productSlug: string;
+  initialReviews: ProductReview[];
+  isLoggedIn: boolean;
+};
+
+export default function ReviewsSection({
+  productSlug,
+  initialReviews,
+  isLoggedIn,
+}: ReviewsSectionProps) {
+  const [reviews, setReviews] = useState(initialReviews);
+  const [rating, setRating] = useState(5);
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [message, setMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const visibleReviews = reviews.length > 0 ? reviews : fallbackReviews;
+  const averageRating = useMemo(() => {
+    const total = visibleReviews.reduce((sum, review) => sum + review.rating, 0);
+
+    return total / visibleReviews.length;
+  }, [visibleReviews]);
+
+  async function submitReview(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setMessage("");
+    setIsSubmitting(true);
+
+    const response = await fetch(`/api/products/${productSlug}/reviews`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ rating, title, content }),
+    });
+    const data = (await response.json()) as {
+      message?: string;
+      reviews?: ProductReview[];
+    };
+
+    setIsSubmitting(false);
+
+    if (!response.ok || !data.reviews) {
+      setMessage(data.message ?? "Unable to save review.");
+      return;
+    }
+
+    setReviews(data.reviews);
+    setTitle("");
+    setContent("");
+    setRating(5);
+    setMessage("Thanks. Your review has been saved.");
+  }
+
   return (
     <section className="pt-28 pb-10">
-      <div
-        className="
-          max-w-[1440px]
-          mx-auto
-
-          px-6
-          lg:px-10
-        "
-      >
-        {/* HEADER */}
-        <div
-          className="
-            flex
-            flex-col
-            lg:flex-row
-
-            lg:items-end
-            lg:justify-between
-
-            gap-8
-
-            mb-14
-          "
-        >
-          {/* LEFT */}
+      <div className="mx-auto max-w-[1440px] px-6 lg:px-10">
+        <div className="mb-14 flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p
-              className="
-                uppercase
-                tracking-[3px]
-                text-sm
-                text-[var(--primary)]
-
-                mb-4
-              "
-            >
+            <p className="mb-4 text-sm uppercase tracking-[3px] text-[var(--primary)]">
               Customer Experience
             </p>
 
-            <h2
-              className="
-                text-4xl
-                lg:text-5xl
-
-                font-serif
-
-                leading-[1.1]
-
-                mb-5
-              "
-            >
+            <h2 className="mb-5 text-4xl leading-[1.1] lg:text-5xl">
               Loved By Modern Interiors
             </h2>
 
-            <p
-              className="
-                max-w-[620px]
-
-                text-[17px]
-                leading-relaxed
-
-                text-[var(--text-secondary)]
-              "
-            >
-              Discover how customers style WOODLOOM pieces into warm, timeless
-              living spaces.
+            <p className="max-w-[620px] text-[17px] leading-relaxed text-[var(--text-secondary)]">
+              Read verified impressions from customers styling WOODLOOM pieces
+              into warm, timeless living spaces.
             </p>
           </div>
 
-          {/* RIGHT SUMMARY */}
-          <div
-            className="
-              flex
-              items-center
-              gap-5
-
-              lg:justify-end
-            "
-          >
-            <div
-              className="
-                flex
-                items-center
-                gap-1
-              "
-            >
-              {[...Array(5)].map((_, i) => (
-                <Star
-                  key={i}
-                  size={18}
-                  className="
-                    fill-[#c8a27a]
-                    text-[#c8a27a]
-                  "
-                />
-              ))}
-            </div>
+          <div className="flex items-center gap-5 lg:justify-end">
+            <RatingStars rating={Math.round(averageRating)} />
 
             <div>
-              <h3
-                className="
-                  text-3xl
-                  font-semibold
-                "
-              >
-                4.9/5
+              <h3 className="text-3xl font-semibold">
+                {averageRating.toFixed(1)}/5
               </h3>
 
-              <p
-                className="
-                  text-sm
-                  text-[var(--text-secondary)]
-                "
-              >
-                Based on 1,200+ reviews
+              <p className="text-sm text-[var(--text-secondary)]">
+                Based on {visibleReviews.length} review
+                {visibleReviews.length === 1 ? "" : "s"}
               </p>
             </div>
           </div>
         </div>
 
-        {/* REVIEWS */}
-        <div
-          className="
-            grid
-            lg:grid-cols-3
-            gap-8
-          "
-        >
-          {reviews.map((review, index) => (
-            <div
-              key={index}
-              className="
-                bg-[var(--surface)]
-
-                rounded-[32px]
-
-                p-8
-
-                border
-                border-[var(--border)]
-
-                hover:-translate-y-1
-
-                transition-all
-                duration-500
-              "
-            >
-              {/* STARS */}
-              <div
-                className="
-                  flex
-                  items-center
-                  gap-1
-
-                  mb-6
-                "
+        <div className="grid gap-8 lg:grid-cols-[1fr_420px]">
+          <div className="grid gap-8 lg:grid-cols-2">
+            {visibleReviews.map((review) => (
+              <article
+                key={review.id}
+                className="rounded-[28px] border border-[var(--border)] bg-[var(--surface)] p-8 transition-all duration-500 hover:-translate-y-1"
               >
-                {[...Array(review.rating)].map((_, i) => (
-                  <Star
-                    key={i}
-                    size={18}
-                    className="
-                        fill-[#c8a27a]
-                        text-[#c8a27a]
-                      "
-                  />
-                ))}
-              </div>
-
-              {/* REVIEW */}
-              <p
-                className="
-                  text-[17px]
-                  leading-relaxed
-
-                  text-[var(--text-secondary)]
-
-                  mb-8
-                "
-              >
-                “{review.review}”
-              </p>
-
-              {/* USER */}
-              <div
-                className="
-                  flex
-                  items-center
-                  justify-between
-                "
-              >
-                <div>
-                  <h4
-                    className="
-                      text-lg
-                      font-medium
-                      mb-1
-                    "
-                  >
-                    {review.name}
-                  </h4>
-
-                  <p
-                    className="
-                      text-sm
-                      text-[var(--text-secondary)]
-                    "
-                  >
-                    {review.role}
-                  </p>
+                <div className="mb-6">
+                  <RatingStars rating={review.rating} />
                 </div>
 
+                <p className="mb-8 text-[17px] leading-relaxed text-[var(--text-secondary)]">
+                  &ldquo;{review.content}&rdquo;
+                </p>
+
+                <div>
+                  <h4 className="mb-1 text-lg font-medium">
+                    {review.customerName}
+                  </h4>
+
+                  <p className="text-sm text-[var(--text-secondary)]">
+                    {review.title}
+                  </p>
+                </div>
+              </article>
+            ))}
+          </div>
+
+          <aside className="rounded-[28px] border border-[var(--border)] bg-[var(--surface)] p-8">
+            <h3 className="mb-3 text-3xl leading-tight">Share Your Review</h3>
+            <p className="mb-6 text-sm leading-relaxed text-[var(--text-secondary)]">
+              Tell other customers how this piece fits your home.
+            </p>
+
+            {isLoggedIn ? (
+              <form className="grid gap-4" onSubmit={submitReview}>
+                <label className="grid gap-2 text-sm font-medium">
+                  Rating
+                  <select
+                    value={rating}
+                    onChange={(event) => setRating(Number(event.target.value))}
+                    className="h-12 rounded-full border border-[var(--border)] bg-transparent px-4 outline-none focus:border-[var(--primary)]"
+                  >
+                    {[5, 4, 3, 2, 1].map((value) => (
+                      <option key={value} value={value}>
+                        {value} star{value === 1 ? "" : "s"}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <label className="grid gap-2 text-sm font-medium">
+                  Short title
+                  <input
+                    value={title}
+                    onChange={(event) => setTitle(event.target.value)}
+                    placeholder="Beautiful finish"
+                    className="h-12 rounded-full border border-[var(--border)] bg-transparent px-4 outline-none focus:border-[var(--primary)]"
+                  />
+                </label>
+
+                <label className="grid gap-2 text-sm font-medium">
+                  Review
+                  <textarea
+                    required
+                    rows={5}
+                    value={content}
+                    onChange={(event) => setContent(event.target.value)}
+                    placeholder="Write your experience"
+                    className="rounded-[18px] border border-[var(--border)] bg-transparent px-4 py-3 outline-none focus:border-[var(--primary)]"
+                  />
+                </label>
+
                 <button
-                  className="
-                    w-11
-                    h-11
-
-                    rounded-full
-
-                    border
-                    border-[var(--border)]
-
-                    flex
-                    items-center
-                    justify-center
-
-                    hover:border-[var(--primary)]
-
-                    transition-all
-                  "
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="h-12 rounded-full bg-[var(--primary)] px-6 text-sm font-semibold uppercase tracking-[2px] text-white disabled:opacity-60"
                 >
-                  <ChevronRight size={18} />
+                  {isSubmitting ? "Saving Review" : "Submit Review"}
                 </button>
-              </div>
-            </div>
-          ))}
+              </form>
+            ) : (
+              <Link
+                href={`/login?next=/products/${productSlug}`}
+                className="flex h-12 items-center justify-center rounded-full bg-[var(--primary)] px-6 text-sm font-semibold uppercase tracking-[2px] text-white"
+              >
+                Login To Review
+              </Link>
+            )}
+
+            {message ? (
+              <p className="mt-4 rounded-lg border border-[var(--border)] bg-[var(--surface-muted)] px-4 py-3 text-sm text-[var(--text-secondary)]">
+                {message}
+              </p>
+            ) : null}
+          </aside>
         </div>
       </div>
     </section>
+  );
+}
+
+function RatingStars({ rating }: { rating: number }) {
+  return (
+    <div className="flex items-center gap-1">
+      {[1, 2, 3, 4, 5].map((value) => (
+        <Star
+          key={value}
+          size={18}
+          className={
+            value <= rating
+              ? "fill-[#c8a27a] text-[#c8a27a]"
+              : "text-[var(--border)]"
+          }
+        />
+      ))}
+    </div>
   );
 }

@@ -9,7 +9,8 @@ import {
   FaYoutube,
   FaLinkedinIn,
 } from "react-icons/fa";
-import { ArrowRight } from "lucide-react";
+
+import NewsletterForm from "./newsletter-form";
 export default function FooterSection() {
   return (
     <footer
@@ -84,70 +85,7 @@ export default function FooterSection() {
               exclusive launches directly in your inbox.
             </p>
 
-            {/* INPUT */}
-            <div
-              className="
-                flex
-                flex-col
-                sm:flex-row
-                gap-4
-              "
-            >
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className="
-                  flex-1
-
-                  h-14
-                  px-5
-
-                  rounded-full
-
-                  bg-white/5
-                  border
-                  border-white/10
-
-                  text-white
-                  placeholder:text-white/40
-
-                  outline-none
-
-                  focus:border-[#c8a27a]
-
-                  transition-all
-                "
-              />
-
-              <button
-                className="
-                  h-14
-                  px-8
-
-                  rounded-full
-
-                  bg-[#c8a27a]
-                  text-black
-
-                  uppercase
-                  tracking-[2px]
-                  text-sm
-                  font-medium
-
-                  hover:bg-[#d5b08a]
-
-                  transition-all
-
-                  flex
-                  items-center
-                  justify-center
-                  gap-2
-                "
-              >
-                Subscribe
-                <ArrowRight size={16} />
-              </button>
-            </div>
+            <NewsletterForm />
           </div>
         </div>
       </div>
@@ -443,13 +381,6 @@ export default function FooterSection() {
                 href="/contact"
                 className="text-white/60 hover:text-[#c8a27a] transition-colors"
               >
-                Careers
-              </Link>
-
-              <Link
-                href="/shipping-policy"
-                className="text-white/60 hover:text-[#c8a27a] transition-colors"
-              >
                 Contact
               </Link>
             </div>
@@ -469,28 +400,28 @@ export default function FooterSection() {
 
             <div className="flex flex-col gap-4">
               <Link
-                href="/return-policy"
+                href="/shipping-policy"
                 className="text-white/60 hover:text-[#c8a27a] transition-colors"
               >
                 Shipping
               </Link>
 
               <Link
-                href="/privacy-policy"
+                href="/return-policy"
                 className="text-white/60 hover:text-[#c8a27a] transition-colors"
               >
                 Returns
               </Link>
 
               <Link
-                href="/terms-and-conditions"
+                href="/privacy-policy"
                 className="text-white/60 hover:text-[#c8a27a] transition-colors"
               >
                 Privacy Policy
               </Link>
 
               <Link
-                href="/"
+                href="/terms-and-conditions"
                 className="text-white/60 hover:text-[#c8a27a] transition-colors"
               >
                 Terms & Conditions
@@ -554,7 +485,7 @@ export default function FooterSection() {
               Terms
             </Link>
 
-            <Link href="/" className="hover:text-white">
+            <Link href="/privacy-policy" className="hover:text-white">
               Cookies
             </Link>
           </div>

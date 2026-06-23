@@ -46,6 +46,11 @@ type AddToCartInput = Omit<CartItem, "quantity"> & {
   quantity?: number;
 };
 
+type AccountCommerceState = {
+  cartItems?: CartItem[];
+  wishlistSlugs?: string[];
+};
+
 const emptyState: CommerceState = {
   cartItems: [],
   wishlistSlugs: [],
@@ -54,6 +59,9 @@ const emptyState: CommerceState = {
 const listeners = new Set<() => void>();
 
 let state = loadInitialState();
+let accountSyncInitialized = false;
+let accountSyncEnabled = false;
+let accountSyncTimer: number | undefined;
 
 function loadInitialState(): CommerceState {
   if (typeof window === "undefined") {
@@ -93,6 +101,78 @@ function persist(nextState: CommerceState) {
   listeners.forEach((listener) => listener());
 }
 
+function mergeCartItems(localItems: CartItem[], accountItems: CartItem[]) {
+  const merged = new Map<string, CartItem>();
+
+  [...accountItems, ...localItems].forEach((item) => {
+    const key = `${item.productSlug}:${item.finish}`;
+    const currentItem = merged.get(key);
+
+    merged.set(key, {
+      ...item,
+      quantity: currentItem
+        ? Math.max(currentItem.quantity, item.quantity)
+        : item.quantity,
+    });
+  });
+
+  return Array.from(merged.values());
+}
+
+function mergeCommerceState(accountState: AccountCommerceState) {
+  const accountCartItems = Array.isArray(accountState.cartItems)
+    ? accountState.cartItems
+    : [];
+  const accountWishlistSlugs = Array.isArray(accountState.wishlistSlugs)
+    ? accountState.wishlistSlugs
+    : [];
+
+  return {
+    ...state,
+    cartItems: mergeCartItems(state.cartItems, accountCartItems),
+    wishlistSlugs: Array.from(
+      new Set([...accountWishlistSlugs, ...state.wishlistSlugs]),
+    ),
+  };
+}
+
+async function saveAccountCommerce() {
+  if (!accountSyncEnabled || typeof window === "undefined") {
+    return;
+  }
+
+  try {
+    const response = await fetch("/api/account/commerce", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        cartItems: state.cartItems,
+        wishlistSlugs: state.wishlistSlugs,
+      }),
+    });
+
+    if (response.status === 401 || response.status === 503) {
+      accountSyncEnabled = false;
+    }
+  } catch {
+    accountSyncEnabled = false;
+  }
+}
+
+function queueAccountCommerceSave() {
+  if (!accountSyncEnabled || typeof window === "undefined") {
+    return;
+  }
+
+  if (accountSyncTimer) {
+    window.clearTimeout(accountSyncTimer);
+  }
+
+  accountSyncTimer = window.setTimeout(() => {
+    void saveAccountCommerce();
+  }, 350);
+}
+
 function subscribe(listener: () => void) {
   listeners.add(listener);
 
@@ -110,6 +190,33 @@ export function useCommerceSelector<T>(selector: (state: CommerceState) => T) {
 }
 
 export const commerceActions = {
+  async syncWithAccount() {
+    if (accountSyncInitialized || typeof window === "undefined") {
+      return;
+    }
+
+    accountSyncInitialized = true;
+
+    try {
+      const response = await fetch("/api/account/commerce", {
+        method: "GET",
+      });
+
+      if (!response.ok) {
+        accountSyncEnabled = false;
+        return;
+      }
+
+      const accountState = (await response.json()) as AccountCommerceState;
+      accountSyncEnabled = true;
+
+      persist(mergeCommerceState(accountState));
+      await saveAccountCommerce();
+    } catch {
+      accountSyncEnabled = false;
+    }
+  },
+
   addToCart(item: AddToCartInput) {
     const quantity = item.quantity ?? 1;
     const existingItem = state.cartItems.find(
@@ -140,6 +247,7 @@ export const commerceActions = {
       ...state,
       cartItems,
     });
+    queueAccountCommerceSave();
   },
 
   toggleWishlist(productSlug: string) {
@@ -151,6 +259,7 @@ export const commerceActions = {
         ? state.wishlistSlugs.filter((slug) => slug !== productSlug)
         : [...state.wishlistSlugs, productSlug],
     });
+    queueAccountCommerceSave();
   },
 
   updateCartItemQuantity(productSlug: string, finish: string, quantity: number) {
@@ -169,6 +278,7 @@ export const commerceActions = {
           : cartItem,
       ),
     });
+    queueAccountCommerceSave();
   },
 
   removeCartItem(productSlug: string, finish: string) {
@@ -179,6 +289,7 @@ export const commerceActions = {
           cartItem.productSlug !== productSlug || cartItem.finish !== finish,
       ),
     });
+    queueAccountCommerceSave();
   },
 
   placeOrder(
@@ -197,6 +308,7 @@ export const commerceActions = {
       cartItems: [],
       lastOrder,
     });
+    queueAccountCommerceSave();
 
     return lastOrder;
   },

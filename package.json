@@ -12,7 +12,9 @@
     "db:seed": "prisma db seed",
     "admin:promote": "tsx scripts/promote-admin.ts",
     "inventory:reconcile": "tsx scripts/reconcile-inventory.ts",
-    "cloudinary:check": "tsx scripts/check-cloudinary.ts"
+    "cloudinary:check": "tsx scripts/check-cloudinary.ts",
+    "env:check": "tsx scripts/check-env.ts",
+    "auth:secret": "tsx scripts/generate-auth-secret.ts"
   },
   "dependencies": {
     "@prisma/adapter-mssql": "^7.8.0",

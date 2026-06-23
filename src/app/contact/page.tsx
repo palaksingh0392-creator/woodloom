@@ -2,6 +2,7 @@ import { Mail, MapPin, MessageCircle, Phone } from "lucide-react";
 
 import MainLayout from "@/components/layout/main-layout";
 import StaticPage from "@/components/shared/static-page";
+import ContactForm from "@/features/contact/components/contact-form";
 
 export const metadata = {
   title: "Contact | WOODLOOM",
@@ -43,6 +44,8 @@ export default function ContactPage() {
         title="Talk To WOODLOOM"
         description="Reach out for furniture guidance, order support, returns, or interior consultation requests."
       >
+        <ContactForm />
+
         <div className="grid gap-5 md:grid-cols-2">
           {contactOptions.map((option) => {
             const Icon = option.icon;

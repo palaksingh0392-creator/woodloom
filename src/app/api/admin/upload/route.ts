@@ -5,6 +5,7 @@ import {
   getUploadMode,
   uploadLocalProductImage,
   uploadProductImage,
+  validateProductImageFile,
 } from "@/lib/cloudinary";
 import { getCurrentSession } from "@/lib/session";
 
@@ -20,17 +21,18 @@ export async function POST(request: Request) {
   const formData = await request.formData();
   const file = formData.get("file");
 
-  if (!(file instanceof File) || file.size === 0) {
+  if (!(file instanceof File)) {
     return NextResponse.json({ message: "Choose an image to upload." }, { status: 400 });
   }
 
-  if (!file.type.startsWith("image/")) {
-    return NextResponse.json({ message: "Only image files are allowed." }, { status: 400 });
-  }
-
-  if (file.size > 8 * 1024 * 1024) {
+  try {
+    validateProductImageFile(file);
+  } catch (error) {
     return NextResponse.json(
-      { message: "Image must be smaller than 8 MB." },
+      {
+        message:
+          error instanceof Error ? error.message : "Invalid image file.",
+      },
       { status: 400 },
     );
   }

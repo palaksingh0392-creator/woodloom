@@ -151,8 +151,8 @@ export default function AccountOrdersContent({
 
         <h2 className="mb-4 text-4xl leading-tight">No Orders Yet</h2>
         <p className="mb-8 max-w-[560px] text-[var(--text-secondary)]">
-          After checkout, order snapshots appear here. Database-backed order
-          history and tracking statuses will connect in the backend phase.
+          After checkout, your saved order history, cancellation updates, and
+          return requests will appear here.
         </p>
 
         <Link

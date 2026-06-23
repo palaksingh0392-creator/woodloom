@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 
 import { Playfair_Display, Manrope } from "next/font/google";
 
+import CommerceSyncProvider from "@/components/providers/commerce-sync-provider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 
 const playfair = Playfair_Display({
@@ -37,7 +38,10 @@ export default function RootLayout({
       `}
     >
       <body>
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <CommerceSyncProvider />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

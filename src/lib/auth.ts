@@ -63,8 +63,16 @@ export function verifyPassword(password: string, storedHash: string) {
   );
 }
 
-function getAuthSecret() {
-  return process.env.AUTH_SECRET || "woodloom-local-development-secret";
+export function getAuthSecret() {
+  if (process.env.AUTH_SECRET) {
+    return process.env.AUTH_SECRET;
+  }
+
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("AUTH_SECRET must be configured in production.");
+  }
+
+  return "woodloom-local-development-secret";
 }
 
 function base64UrlEncode(value: string) {

@@ -4,6 +4,7 @@ import { createHash, randomInt } from "crypto";
 
 import {
   createSignedToken,
+  getAuthSecret,
   verifySignedToken,
 } from "@/lib/auth";
 import { sendAuthEmail } from "@/lib/email";
@@ -19,7 +20,7 @@ type OtpPayload = {
 
 function hashOtp(email: string, otp: string, purpose: OtpPurpose) {
   return createHash("sha256")
-    .update(`${email}:${otp}:${purpose}:${process.env.AUTH_SECRET ?? "woodloom-local-development-secret"}`)
+    .update(`${email}:${otp}:${purpose}:${getAuthSecret()}`)
     .digest("hex");
 }
 
@@ -53,7 +54,7 @@ export async function createOtpChallenge(input: {
   return {
     challenge,
     expiresAt,
-    devOtp: process.env.EMAIL_DELIVERY_MODE === "provider" ? undefined : otp,
+    devOtp: process.env.EMAIL_DELIVERY_MODE === "smtp" ? undefined : otp,
   };
 }
 

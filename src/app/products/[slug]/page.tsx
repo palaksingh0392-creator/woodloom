@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 
+import MainLayout from "@/components/layout/main-layout";
 import ProductGallery from "@/components/products/product-gallery";
 import ProductInfo from "@/components/products/product-info";
 import ReviewsSection from "@/components/products/reviews-section";
@@ -7,6 +8,8 @@ import {
   getCatalogProductBySlug,
   listCatalogProducts,
 } from "@/lib/catalog";
+import { listProductReviews } from "@/lib/reviews";
+import { getCurrentSession } from "@/lib/session";
 
 type ProductPageProps = {
   params: Promise<{
@@ -40,46 +43,55 @@ export async function generateMetadata({ params }: ProductPageProps) {
 
 export default async function ProductPage({ params }: ProductPageProps) {
   const { slug } = await params;
-  const product = await getCatalogProductBySlug(slug);
+  const [product, reviews, session] = await Promise.all([
+    getCatalogProductBySlug(slug),
+    listProductReviews(slug),
+    getCurrentSession(),
+  ]);
 
   if (!product) {
     notFound();
   }
 
   return (
-    <main
-      className="
-        bg-[var(--background)]
-        min-h-screen
-        pt-6
-        lg:pt-10
-        pb-20
-        lg:pb-24
-      "
-    >
-      <div
+    <MainLayout>
+      <section
         className="
-          max-w-[1440px]
-          mx-auto
-          px-5
-          sm:px-6
-          lg:px-10
-          grid
-          lg:grid-cols-2
-          gap-10
-          lg:gap-14
+          bg-[var(--background)]
+          pt-6
+          lg:pt-10
+          pb-20
+          lg:pb-24
         "
       >
-        <ProductGallery
-          images={product.images}
-          title={product.title}
-          badge={product.badge}
+        <div
+          className="
+            max-w-[1440px]
+            mx-auto
+            px-5
+            sm:px-6
+            lg:px-10
+            grid
+            lg:grid-cols-2
+            gap-10
+            lg:gap-14
+          "
+        >
+          <ProductGallery
+            images={product.images}
+            title={product.title}
+            badge={product.badge}
+          />
+
+          <ProductInfo product={product} />
+        </div>
+
+        <ReviewsSection
+          productSlug={product.slug}
+          initialReviews={reviews}
+          isLoggedIn={Boolean(session)}
         />
-
-        <ProductInfo product={product} />
-      </div>
-
-      <ReviewsSection />
-    </main>
+      </section>
+    </MainLayout>
   );
 }

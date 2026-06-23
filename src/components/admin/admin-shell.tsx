@@ -5,7 +5,10 @@ import {
   FileText,
   Layers,
   LayoutDashboard,
+  Mail,
+  MessageSquareText,
   PackageCheck,
+  Settings,
   ShoppingBag,
   Tags,
   Users,
@@ -18,8 +21,11 @@ const adminLinks = [
   { href: "/admin/categories", label: "Categories", icon: Tags },
   { href: "/admin/collections", label: "Collections", icon: Layers },
   { href: "/admin/blogs", label: "Blogs", icon: FileText },
+  { href: "/admin/reviews", label: "Reviews", icon: MessageSquareText },
+  { href: "/admin/messages", label: "Messages", icon: Mail },
   { href: "/admin/inventory", label: "Inventory", icon: Boxes },
   { href: "/admin/customers", label: "Customers", icon: Users },
+  { href: "/admin/system", label: "System", icon: Settings },
 ];
 
 export default function AdminShell({ children }: { children: React.ReactNode }) {

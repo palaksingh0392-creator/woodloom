@@ -4,12 +4,33 @@ import { createHash, randomUUID } from "node:crypto";
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 
+const allowedImageTypes = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+]);
+
 export function isCloudinaryConfigured() {
   return Boolean(
     process.env.CLOUDINARY_CLOUD_NAME &&
       process.env.CLOUDINARY_API_KEY &&
       process.env.CLOUDINARY_API_SECRET,
   );
+}
+
+export function validateProductImageFile(file: File) {
+  if (file.size === 0) {
+    throw new Error("Choose an image to upload.");
+  }
+
+  if (!allowedImageTypes.has(file.type)) {
+    throw new Error("Only JPG, PNG, WebP, or GIF images are allowed.");
+  }
+
+  if (file.size > 8 * 1024 * 1024) {
+    throw new Error("Image must be smaller than 8 MB.");
+  }
 }
 
 export function canUseLocalUploads() {
@@ -58,7 +79,10 @@ export async function uploadProductImage(file: File) {
   };
 
   if (!response.ok || !result.secure_url) {
-    throw new Error(result.error?.message ?? "Image upload failed.");
+    throw new Error(
+      result.error?.message ??
+        `Cloudinary upload failed with status ${response.status}.`,
+    );
   }
 
   return result.secure_url;
@@ -78,6 +102,8 @@ function getFileExtension(file: File) {
 }
 
 export async function uploadLocalProductImage(file: File) {
+  validateProductImageFile(file);
+
   if (!canUseLocalUploads()) {
     throw new Error(
       "Cloudinary is required for this environment. Add Cloudinary keys before uploading images.",
