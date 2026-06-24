@@ -1,0 +1,545 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>WOODLOOM Admin Guide</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm; }
+  * { box-sizing: border-box; }
+  body { margin: 0; color: #1f2933; background: #fff; font-family: Arial, Helvetica, sans-serif; font-size: 11.5pt; line-height: 1.55; }
+  main { max-width: 780px; margin: 0 auto; }
+  .cover { border-bottom: 2px solid #8b5e34; padding-bottom: 18px; margin-bottom: 22px; }
+  .brand { color: #8b5e34; font-size: 10pt; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+  h1 { color: #2f241c; font-size: 27pt; line-height: 1.12; margin: 8px 0 10px; page-break-after: avoid; }
+  h2 { color: #3c2f26; font-size: 18pt; margin: 26px 0 8px; border-bottom: 1px solid #d8c7b6; padding-bottom: 5px; page-break-after: avoid; }
+  h3 { color: #554236; font-size: 13.5pt; margin: 18px 0 6px; page-break-after: avoid; }
+  h4 { color: #554236; font-size: 12pt; margin: 14px 0 4px; page-break-after: avoid; }
+  p { margin: 0 0 8px; }
+  ul, ol { margin: 4px 0 10px 22px; padding: 0; }
+  li { margin: 3px 0; }
+  code { font-family: Consolas, 'Courier New', monospace; background: #f4eee8; color: #5c3b21; padding: 1px 4px; border-radius: 3px; }
+  pre { background: #f7f3ee; border: 1px solid #eadbcc; border-radius: 6px; padding: 10px 12px; white-space: pre-wrap; page-break-inside: avoid; }
+  pre code { background: transparent; padding: 0; }
+  strong { color: #2f241c; }
+  .meta { color: #68727d; font-size: 10.5pt; }
+</style>
+</head>
+<body><main><section class="cover"><div class="brand">WOODLOOM Documentation</div><h1>WOODLOOM Admin Guide</h1><p class="meta">Generated on June 23, 2026</p></section><h1>WOODLOOM Admin Guide</h1>
+<p>This guide explains how an admin or staff member uses and manages the WOODLOOM</p>
+<p>website. It is written in simple language but includes enough detail for daily</p>
+<p>operations.</p>
+<h2>1. What Is The Admin Panel?</h2>
+<p>The admin panel is the control room of the website.</p>
+<p>Customers use the storefront to shop. Admins use the admin panel to manage:</p>
+<ul>
+<li>Dashboard overview.</li>
+<li>Products.</li>
+<li>Categories.</li>
+<li>Collections.</li>
+<li>Orders.</li>
+<li>Inventory.</li>
+<li>Customers.</li>
+<li>Blog articles.</li>
+<li>Product reviews.</li>
+<li>Contact messages.</li>
+<li>Newsletter subscribers.</li>
+<li>System health.</li>
+</ul>
+<p>Admin route:</p>
+<pre><code>/admin</code></pre>
+<p>Admin login route:</p>
+<pre><code>/admin-login</code></pre>
+<h2>2. Admin Roles</h2>
+<p>The system supports roles:</p>
+<ul>
+<li><code>CUSTOMER</code></li>
+<li><code>ADMIN</code></li>
+<li><code>STAFF</code></li>
+</ul>
+<p>Only <code>ADMIN</code> and <code>STAFF</code> can access the admin panel.</p>
+<p>If a customer tries to open admin pages, they are redirected away.</p>
+<h2>3. Admin Login Flow</h2>
+<ol>
+<li>Open <code>/admin-login</code>.</li>
+<li>Enter admin email and password.</li>
+<li>Website checks the database.</li>
+<li>If the account has <code>ADMIN</code> or <code>STAFF</code> role, admin enters dashboard.</li>
+<li>If the account is only <code>CUSTOMER</code>, access is denied.</li>
+</ol>
+<p>To promote a user to admin locally:</p>
+<pre><code>npm run admin:promote -- admin@example.com</code></pre>
+<h2>4. Admin Sidebar</h2>
+<p>The admin sidebar contains links:</p>
+<ul>
+<li>Overview</li>
+<li>Orders</li>
+<li>Products</li>
+<li>Categories</li>
+<li>Collections</li>
+<li>Blogs</li>
+<li>Reviews</li>
+<li>Messages</li>
+<li>Inventory</li>
+<li>Customers</li>
+<li>System</li>
+</ul>
+<p>Each link opens one management area.</p>
+<h2>5. Overview Dashboard</h2>
+<p>The overview dashboard gives a quick picture of the store.</p>
+<p>It can show:</p>
+<ul>
+<li>Total revenue.</li>
+<li>Orders.</li>
+<li>Customers.</li>
+<li>Low-stock products.</li>
+<li>Recent orders.</li>
+</ul>
+<p>Use this page to quickly understand store activity.</p>
+<h2>6. Product Management</h2>
+<p>Products are the main items sold on the website.</p>
+<p>Admin can:</p>
+<ul>
+<li>View product list.</li>
+<li>Create product.</li>
+<li>Edit product.</li>
+<li>Archive product.</li>
+<li>Upload product images.</li>
+<li>Add variants/finishes.</li>
+<li>Set stock.</li>
+<li>Set price.</li>
+<li>Mark product as featured.</li>
+</ul>
+<h3>Product Fields</h3>
+<p>Important product fields:</p>
+<ul>
+<li>Product name.</li>
+<li>URL slug.</li>
+<li>SKU.</li>
+<li>Category.</li>
+<li>Collection.</li>
+<li>Short description.</li>
+<li>Full description.</li>
+<li>Material.</li>
+<li>Dimensions.</li>
+<li>Care instructions.</li>
+<li>Warranty.</li>
+<li>Price.</li>
+<li>Compare-at price.</li>
+<li>Status.</li>
+<li>Featured flag.</li>
+<li>Badge.</li>
+<li>Images.</li>
+<li>Variants.</li>
+</ul>
+<h3>Product Status</h3>
+<p>Common statuses:</p>
+<ul>
+<li><code>DRAFT</code>: Product is being prepared.</li>
+<li><code>ACTIVE</code>: Product is visible to customers.</li>
+<li><code>ARCHIVED</code>: Product is not actively sold.</li>
+</ul>
+<h3>Product Variant</h3>
+<p>A variant is a version of a product.</p>
+<p>Example:</p>
+<p>One chair can have finishes:</p>
+<ul>
+<li>Natural Oak.</li>
+<li>Walnut.</li>
+<li>Dark Ash.</li>
+</ul>
+<p>Each variant can have:</p>
+<ul>
+<li>Finish name.</li>
+<li>Color.</li>
+<li>SKU.</li>
+<li>Stock.</li>
+<li>Reorder level.</li>
+</ul>
+<h2>7. Image Uploads</h2>
+<p>Admins can upload product images.</p>
+<p>Allowed image types:</p>
+<ul>
+<li>JPG</li>
+<li>PNG</li>
+<li>WebP</li>
+<li>GIF</li>
+</ul>
+<p>Maximum size:</p>
+<pre><code>8 MB</code></pre>
+<p>Local development:</p>
+<ul>
+<li>Images can be stored in local uploads when <code>CLOUDINARY_UPLOAD_MODE=local</code>.</li>
+</ul>
+<p>Production:</p>
+<ul>
+<li>Images should be uploaded to Cloudinary.</li>
+<li>Vercel cannot permanently store local uploaded files.</li>
+</ul>
+<p>Required production variables:</p>
+<pre><code>CLOUDINARY_UPLOAD_MODE=cloudinary
+CLOUDINARY_CLOUD_NAME
+CLOUDINARY_API_KEY
+CLOUDINARY_API_SECRET</code></pre>
+<p>Check Cloudinary:</p>
+<pre><code>npm run cloudinary:check</code></pre>
+<h2>8. Category Management</h2>
+<p>Categories group products by type or room.</p>
+<p>Examples:</p>
+<ul>
+<li>Living Room.</li>
+<li>Bedroom.</li>
+<li>Dining Room.</li>
+<li>Office.</li>
+<li>Decor.</li>
+</ul>
+<p>Admin can:</p>
+<ul>
+<li>Create category.</li>
+<li>Edit category.</li>
+<li>Activate/deactivate category.</li>
+<li>Set image.</li>
+<li>Set sort order.</li>
+</ul>
+<p>Categories help customers browse products easily.</p>
+<h2>9. Collection Management</h2>
+<p>Collections are curated product groups.</p>
+<p>Examples:</p>
+<ul>
+<li>Scandinavian Lounge Collection.</li>
+<li>Modern Dining Collection.</li>
+<li>Accent Essentials.</li>
+</ul>
+<p>Admin can:</p>
+<ul>
+<li>Create collection.</li>
+<li>Edit collection.</li>
+<li>Activate/deactivate collection.</li>
+</ul>
+<p>Collections help with marketing and curated shopping.</p>
+<h2>10. Order Management</h2>
+<p>Orders are created when a logged-in customer checks out.</p>
+<p>Order data includes:</p>
+<ul>
+<li>Order number.</li>
+<li>Customer.</li>
+<li>Shipping address.</li>
+<li>Items.</li>
+<li>Quantity.</li>
+<li>Product SKU.</li>
+<li>Payment method.</li>
+<li>Payment status.</li>
+<li>Order status.</li>
+<li>Total amount.</li>
+</ul>
+<h3>Order Status Flow</h3>
+<p>A simple order journey:</p>
+<ol>
+<li>Customer places order.</li>
+<li>Order becomes confirmed.</li>
+<li>Inventory is reserved.</li>
+<li>Admin processes order.</li>
+<li>Order moves through shipping stages.</li>
+<li>Order is delivered.</li>
+</ol>
+<p>If cancelled:</p>
+<ul>
+<li>Inventory reservation is released or adjusted.</li>
+</ul>
+<p>If returned:</p>
+<ul>
+<li>Return request is created.</li>
+<li>Inventory flow is updated based on return status.</li>
+</ul>
+<h3>Handling Order Questions</h3>
+<p>If a customer asks, &quot;Where is my order?&quot;:</p>
+<ol>
+<li>Open admin orders.</li>
+<li>Search by order number or customer.</li>
+<li>Check status.</li>
+<li>Tell customer the current status.</li>
+</ol>
+<p>If customer asks to cancel:</p>
+<ol>
+<li>Check order status.</li>
+<li>If order is not delivered/cancelled/returned, cancellation may be allowed.</li>
+<li>Cancel from admin or guide user to account orders.</li>
+</ol>
+<p>If customer asks for return:</p>
+<ol>
+<li>Check if order is delivered.</li>
+<li>If delivered, user can request return from account.</li>
+<li>Admin can review returned order flow.</li>
+</ol>
+<h2>11. Inventory Management</h2>
+<p>Inventory means stock.</p>
+<p>Admin uses inventory page to see:</p>
+<ul>
+<li>Product variants.</li>
+<li>Stock count.</li>
+<li>Reserved count.</li>
+<li>Available count.</li>
+<li>Reorder level.</li>
+</ul>
+<p>Definitions:</p>
+<ul>
+<li><code>Stock</code>: Total units available in warehouse.</li>
+<li><code>Reserved</code>: Units held for confirmed orders.</li>
+<li><code>Available</code>: Stock minus reserved.</li>
+<li><code>Reorder at</code>: When stock is low and admin should restock.</li>
+</ul>
+<p>Inventory warning:</p>
+<p>If stock is low, admin should restock before customers place more orders.</p>
+<p>Reconcile inventory:</p>
+<pre><code>npm run inventory:reconcile</code></pre>
+<h2>12. Customer Management</h2>
+<p>The customers page helps admin view customer accounts.</p>
+<p>Admin can check:</p>
+<ul>
+<li>Name.</li>
+<li>Email.</li>
+<li>Phone.</li>
+<li>Account status.</li>
+<li>Order count.</li>
+<li>Created date.</li>
+</ul>
+<p>Use this when handling support requests.</p>
+<h2>13. Blog Management</h2>
+<p>Blog articles appear on the public journal/blog page.</p>
+<p>Admin can:</p>
+<ul>
+<li>Create article.</li>
+<li>Edit article.</li>
+<li>Publish article.</li>
+<li>Unpublish article.</li>
+</ul>
+<p>Blog fields:</p>
+<ul>
+<li>Title.</li>
+<li>Slug.</li>
+<li>Excerpt.</li>
+<li>Content.</li>
+<li>Image URL.</li>
+<li>Author/category label.</li>
+<li>Published status.</li>
+</ul>
+<p>If no database blog exists, the public blog can still show static fallback</p>
+<p>articles.</p>
+<h2>14. Review Moderation</h2>
+<p>Customers can submit product reviews.</p>
+<p>Admin reviews page shows:</p>
+<ul>
+<li>Product.</li>
+<li>Customer name.</li>
+<li>Customer email.</li>
+<li>Rating.</li>
+<li>Review content.</li>
+<li>Visible/hidden status.</li>
+</ul>
+<p>Admin can:</p>
+<ul>
+<li>Hide review.</li>
+<li>Show review.</li>
+<li>Delete review.</li>
+</ul>
+<p>When to hide a review:</p>
+<ul>
+<li>It contains spam.</li>
+<li>It contains bad language.</li>
+<li>It is not related to the product.</li>
+<li>It shares private information.</li>
+</ul>
+<p>When to delete a review:</p>
+<ul>
+<li>It is clearly fake or abusive.</li>
+<li>It contains dangerous content.</li>
+<li>It was submitted by mistake and must be removed.</li>
+</ul>
+<h2>15. Contact Messages</h2>
+<p>Customers can submit contact messages from the contact page.</p>
+<p>Admin messages page shows:</p>
+<ul>
+<li>Name.</li>
+<li>Email.</li>
+<li>Phone.</li>
+<li>Subject.</li>
+<li>Message.</li>
+<li>Status.</li>
+<li>Date.</li>
+</ul>
+<p>Message statuses:</p>
+<ul>
+<li><code>NEW</code>: Not handled yet.</li>
+<li><code>READ</code>: Admin has seen it.</li>
+<li><code>RESOLVED</code>: Issue is handled.</li>
+</ul>
+<p>How to handle a query:</p>
+<ol>
+<li>Open admin messages.</li>
+<li>Read the subject and message.</li>
+<li>Reply to the customer using email or phone.</li>
+<li>Mark message as <code>READ</code>.</li>
+<li>When completed, mark as <code>RESOLVED</code>.</li>
+</ol>
+<h2>16. Newsletter Subscribers</h2>
+<p>Newsletter subscribers are people who entered their email in the footer form.</p>
+<p>Admin can:</p>
+<ul>
+<li>See subscriber email.</li>
+<li>See source.</li>
+<li>See status.</li>
+<li>Mark subscriber active or unsubscribed.</li>
+</ul>
+<p>Use this list for marketing emails only when email rules and customer consent</p>
+<p>are followed.</p>
+<h2>17. System Health Page</h2>
+<p>Admin route:</p>
+<pre><code>/admin/system</code></pre>
+<p>Public health route:</p>
+<pre><code>/api/health</code></pre>
+<p>System health checks:</p>
+<ul>
+<li>Database.</li>
+<li>Auth secret.</li>
+<li>Cloudinary.</li>
+<li>Email.</li>
+<li>App URL.</li>
+</ul>
+<p>Statuses:</p>
+<ul>
+<li><code>ok</code>: Working.</li>
+<li><code>warning</code>: Works locally or partly configured.</li>
+<li><code>error</code>: Needs fixing.</li>
+</ul>
+<p>Example:</p>
+<p>If Cloudinary is missing in production, image uploads may fail. The system page</p>
+<p>will show Cloudinary as warning or error.</p>
+<h2>18. Environment Setup</h2>
+<p>Important production variables:</p>
+<pre><code>DATABASE_URL
+AUTH_SECRET
+NEXT_PUBLIC_APP_URL
+CLOUDINARY_UPLOAD_MODE
+CLOUDINARY_CLOUD_NAME
+CLOUDINARY_API_KEY
+CLOUDINARY_API_SECRET
+EMAIL_DELIVERY_MODE
+SMTP_HOST
+SMTP_PORT
+SMTP_SECURE
+SMTP_USER
+SMTP_PASS
+SMTP_FROM</code></pre>
+<p>Generate auth secret:</p>
+<pre><code>npm run auth:secret</code></pre>
+<p>Check environment:</p>
+<pre><code>npm run env:check</code></pre>
+<h2>19. Production Database Warning</h2>
+<p>Vercel cannot use:</p>
+<pre><code>localhost:1433</code></pre>
+<p>That is only your local computer.</p>
+<p>For production, use a hosted database that Vercel can reach.</p>
+<p>Until hosted database is configured:</p>
+<ul>
+<li>Public static pages can work.</li>
+<li>Admin database features may fail.</li>
+<li>Login/register may fail.</li>
+<li>Orders may fail.</li>
+<li>Reviews/messages/newsletter may fail.</li>
+</ul>
+<h2>20. Common Admin Problems And Fixes</h2>
+<h3>&quot;Admin login does not work&quot;</h3>
+<p>Check:</p>
+<ul>
+<li>Database is connected.</li>
+<li>User exists.</li>
+<li>User role is <code>ADMIN</code> or <code>STAFF</code>.</li>
+<li>Password is correct.</li>
+<li><code>AUTH_SECRET</code> is configured in production.</li>
+</ul>
+<h3>&quot;Product image upload fails&quot;</h3>
+<p>Check:</p>
+<ul>
+<li>File is JPG, PNG, WebP, or GIF.</li>
+<li>File is under 8 MB.</li>
+<li>Cloudinary keys are set in production.</li>
+<li><code>CLOUDINARY_UPLOAD_MODE=cloudinary</code> in production.</li>
+</ul>
+<h3>&quot;Order cannot be placed&quot;</h3>
+<p>Check:</p>
+<ul>
+<li>Customer is logged in.</li>
+<li>Cart has items.</li>
+<li>Product variants exist.</li>
+<li>Stock is available.</li>
+<li>Address exists.</li>
+<li>Database is connected.</li>
+</ul>
+<h3>&quot;OTP email is not received&quot;</h3>
+<p>Check:</p>
+<ul>
+<li><code>EMAIL_DELIVERY_MODE=smtp</code>.</li>
+<li>SMTP host/user/password/from are correct.</li>
+<li>Gmail app password is used if using Gmail.</li>
+<li>Customer checked spam folder.</li>
+</ul>
+<h3>&quot;Admin page shows empty data&quot;</h3>
+<p>Possible reasons:</p>
+<ul>
+<li>No records exist yet.</li>
+<li>Database table is missing.</li>
+<li>Database connection is wrong.</li>
+<li>Production database is not configured.</li>
+</ul>
+<h3>&quot;Health endpoint returns 503&quot;</h3>
+<p>This means one or more important systems are not ready.</p>
+<p>Open:</p>
+<pre><code>/admin/system</code></pre>
+<p>Then check which item is <code>error</code>.</p>
+<h2>21. Daily Admin Checklist</h2>
+<p>Every day, admin should check:</p>
+<ol>
+<li>System health.</li>
+<li>New orders.</li>
+<li>Low inventory.</li>
+<li>New contact messages.</li>
+<li>New reviews.</li>
+<li>Product stock.</li>
+<li>Failed uploads or missing images.</li>
+</ol>
+<h2>22. Safe Admin Rules</h2>
+<ul>
+<li>Do not share admin password.</li>
+<li>Do not share OTP.</li>
+<li>Do not commit <code>.env</code>.</li>
+<li>Do not expose API keys.</li>
+<li>Confirm before deleting important records.</li>
+<li>Keep product prices correct.</li>
+<li>Test checkout after major changes.</li>
+<li>Check health page after deployment.</li>
+</ul>
+<h2>23. Full Admin Work Flow Example</h2>
+<p>Example: A new product arrives.</p>
+<ol>
+<li>Admin logs in.</li>
+<li>Opens products.</li>
+<li>Clicks new product.</li>
+<li>Enters product details.</li>
+<li>Adds category and collection.</li>
+<li>Adds variants and stock.</li>
+<li>Uploads images.</li>
+<li>Sets status to <code>ACTIVE</code>.</li>
+<li>Saves product.</li>
+<li>Opens storefront product page.</li>
+<li>Checks image, price, description, cart, and checkout flow.</li>
+</ol>
+<p>Example: A customer asks about a delayed order.</p>
+<ol>
+<li>Admin opens messages or orders.</li>
+<li>Finds customer or order number.</li>
+<li>Checks order status.</li>
+<li>Replies to customer.</li>
+<li>Marks message as resolved.</li>
+<li>Updates order status if needed.</li>
+</ol>
+</main></body>
+</html>
