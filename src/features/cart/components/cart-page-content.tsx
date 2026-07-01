@@ -95,8 +95,8 @@ export default function CartPageContent() {
                     {item.finish}
                   </p>
 
-                  <Link href={`/products/${item.productSlug}`}>
-                    <h2 className="text-3xl font-serif mb-3">{item.title}</h2>
+              <Link href={`/products/${item.productSlug}`}>
+                    <h2 className="mb-3 font-serif text-2xl sm:text-3xl">{item.title}</h2>
                   </Link>
 
                   <p className="text-xl font-semibold">{item.price}</p>
@@ -155,13 +155,15 @@ export default function CartPageContent() {
 
         <aside
           className="
-            sticky
+            lg:sticky
             top-32
-            rounded-[28px]
+            rounded-[22px]
+            sm:rounded-[28px]
             border
             border-[var(--border)]
             bg-[var(--surface)]
-            p-8
+            p-5
+            sm:p-8
           "
         >
           <h2 className="text-3xl font-serif mb-8">Order Summary</h2>

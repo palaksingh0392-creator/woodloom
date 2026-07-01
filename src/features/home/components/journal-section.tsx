@@ -51,9 +51,9 @@ export default function JournalSection() {
 
   return (
     <section className="bg-[var(--background)]">
-      <div className="max-w-[1440px] mx-auto">
+      <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-0">
         {/* TOP BANNER */}
-        <div className="relative h-[420px] overflow-hidden rounded-[20px] lg:rounded-[28px]">
+        <div className="relative h-[380px] overflow-hidden rounded-[18px] sm:h-[420px] lg:rounded-[28px]">
           {heroSlides.map((slide, index) => (
             <div
               key={index}
@@ -71,24 +71,29 @@ export default function JournalSection() {
 
               <div className="absolute inset-0 bg-black/45" />
 
-              <div className="relative z-20 h-full flex items-center px-12">
-                <div className="max-w-105 text-white">
-                  <p className="uppercase tracking-[6px] text-xs mb-4 text-white/70">
+              <div className="relative z-20 flex h-full items-center px-5 sm:px-8 lg:px-12">
+                <div className="max-w-[26.25rem] text-white">
+                  <p className="mb-4 text-[11px] uppercase tracking-[0.28em] text-white/70 sm:text-xs sm:tracking-[0.5em]">
                     Interior Consultation
                   </p>
 
-                  <h2 className="text-5xl leading-[1.1] font-serif mb-5">
+                  <h2 className="mb-5 font-serif text-[2.25rem] leading-[1.08] sm:text-5xl">
                     {slide.title}
                   </h2>
 
-                  <p className="text-white/80 text-lg leading-relaxed mb-8">
+                  <p className="mb-8 text-base leading-relaxed text-white/80 sm:text-lg">
                     {slide.description}
                   </p>
 
-                  <button
+                  <Link
+                    href="/contact"
                     className="
-                      h-14
-                      px-8
+                      inline-flex
+                      min-h-14
+                      items-center
+                      justify-center
+                      px-6
+                      sm:px-8
                       rounded-full
                       border
                       border-white/40
@@ -101,7 +106,7 @@ export default function JournalSection() {
                     "
                   >
                     Talk To A Designer
-                  </button>
+                  </Link>
                 </div>
               </div>
             </div>
@@ -126,7 +131,8 @@ export default function JournalSection() {
           className="
             mt-10
             grid
-            grid-cols-2
+            grid-cols-1
+            sm:grid-cols-2
             md:grid-cols-3
             lg:grid-cols-6
             border
@@ -174,7 +180,8 @@ export default function JournalSection() {
                 flex
                 items-center
                 gap-4
-                px-5
+                px-4
+                sm:px-5
                 py-6
                 border-r
                 border-b
@@ -201,13 +208,13 @@ export default function JournalSection() {
         {/* JOURNAL */}
         <div className="mt-20">
           {/* HEADER */}
-          <div className="flex items-center justify-between mb-10">
+          <div className="mb-10 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="uppercase tracking-[4px] text-xs text-[var(--primary)] mb-3">
                 From The Journal
               </p>
 
-              <h2 className="text-4xl lg:text-5xl font-serif text-[var(--text-primary)]">
+              <h2 className="font-serif text-4xl text-[var(--text-primary)] max-[360px]:text-[2rem] lg:text-5xl">
                 Stories & Inspiration
               </h2>
             </div>
@@ -215,7 +222,8 @@ export default function JournalSection() {
             <Link
               href="/blog"
               className="
-                flex
+                hidden
+                sm:flex
                 items-center
                 gap-2
                 uppercase
@@ -246,8 +254,8 @@ export default function JournalSection() {
                 key={post.slug}
                 href={`/blog/${post.slug}`}
                 className="
-                  min-w-85
-                  max-w-85
+                  min-w-[min(21rem,calc(100vw-2rem))]
+                  max-w-[min(21rem,calc(100vw-2rem))]
                   bg-[var(--surface)]
                   rounded-[14px]
                   overflow-hidden
@@ -258,7 +266,7 @@ export default function JournalSection() {
                   group
                 "
               >
-                <div className="relative h-75 overflow-hidden">
+                <div className="relative h-[18.75rem] overflow-hidden">
                   <Image
                     src={post.image}
                     alt={post.title}

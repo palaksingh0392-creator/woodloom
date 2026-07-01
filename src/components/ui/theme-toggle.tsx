@@ -15,16 +15,23 @@ export default function ThemeToggle() {
     return () => window.clearTimeout(timeout);
   }, []);
 
-  const isDark = theme === "dark";
+  const isDark = mounted && theme === "dark";
   const label = isDark ? "Switch to light theme" : "Switch to dark theme";
 
   return (
     <button
-      onClick={() => setTheme(isDark ? "light" : "dark")}
+      onClick={() => {
+        if (!mounted) {
+          return;
+        }
+
+        setTheme(isDark ? "light" : "dark");
+      }}
       aria-label={label}
       className="
         card-surface
-        p-3
+        p-2.5
+        sm:p-3
         transition-default
         hover:scale-105
       "

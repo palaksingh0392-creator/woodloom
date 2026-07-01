@@ -29,7 +29,9 @@ export default function FeaturedProducts({ products }: { products: Product[] }) 
       className="
         border-t
         border-[var(--border)]
-        py-24
+        py-16
+        sm:py-20
+        lg:py-24
         overflow-hidden
       "
     >
@@ -37,13 +39,18 @@ export default function FeaturedProducts({ products }: { products: Product[] }) 
         className="
           max-w-[1600px]
           mx-auto
-          px-6
+          px-4
+          sm:px-6
           lg:px-10
         "
       >
         <div
           className="
             flex
+            flex-col
+            gap-5
+            sm:flex-row
+            sm:items-end
             items-center
             justify-between
             mb-12
@@ -65,6 +72,7 @@ export default function FeaturedProducts({ products }: { products: Product[] }) 
             <h2
               className="
                 text-4xl
+                max-[360px]:text-[2rem]
                 lg:text-[52px]
                 leading-[0.95]
                 tracking-normal
@@ -105,13 +113,14 @@ export default function FeaturedProducts({ products }: { products: Product[] }) 
               left-[-10px]
               top-[35%]
               z-20
+              hidden
+              md:flex
               w-14
               h-14
               rounded-full
               bg-[var(--surface)]
               text-[var(--text-primary)]
               shadow-md
-              flex
               items-center
               justify-center
               hover:scale-105
@@ -128,13 +137,14 @@ export default function FeaturedProducts({ products }: { products: Product[] }) 
               right-[-10px]
               top-[35%]
               z-20
+              hidden
+              md:flex
               w-14
               h-14
               rounded-full
               bg-[var(--surface)]
               text-[var(--text-primary)]
               shadow-md
-              flex
               items-center
               justify-center
               hover:scale-105
@@ -148,12 +158,16 @@ export default function FeaturedProducts({ products }: { products: Product[] }) 
             onSwiper={(swiper) => {
               swiperRef.current = swiper;
             }}
-            spaceBetween={24}
+            spaceBetween={16}
             grabCursor={true}
-            slidesPerView={1.2}
+            slidesPerView={1.03}
+            resistanceRatio={0.7}
+            threshold={6}
+            watchOverflow={true}
             breakpoints={{
               640: {
                 slidesPerView: 2.2,
+                spaceBetween: 24,
               },
               1024: {
                 slidesPerView: 3.2,
@@ -162,7 +176,7 @@ export default function FeaturedProducts({ products }: { products: Product[] }) 
                 slidesPerView: 4.2,
               },
             }}
-            className="!overflow-visible"
+            className="mobile-swiper-rail"
           >
             {products.map((product) => {
               const liked = wishlistSlugs.includes(product.slug);
@@ -176,8 +190,11 @@ export default function FeaturedProducts({ products }: { products: Product[] }) 
                     <div
                       className="
                         relative
-                        h-[420px]
-                        rounded-[28px]
+                        h-[320px]
+                        sm:h-[380px]
+                        lg:h-[420px]
+                        rounded-[18px]
+                        sm:rounded-[28px]
                         overflow-hidden
                         bg-[var(--surface-muted)]
                       "
@@ -241,6 +258,7 @@ export default function FeaturedProducts({ products }: { products: Product[] }) 
                       <h3
                         className="
                           text-[24px]
+                          max-[360px]:text-[21px]
                           mb-2
                           text-[var(--text-primary)]
                         "
@@ -262,7 +280,8 @@ export default function FeaturedProducts({ products }: { products: Product[] }) 
 
                       <p
                         className="
-                          text-[30px]
+                          text-[24px]
+                          sm:text-[30px]
                           text-[var(--text-primary)]
                         "
                       >

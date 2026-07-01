@@ -21,6 +21,7 @@ export default function ProductGallery({
     <div
       className="
         grid
+        min-w-0
         lg:grid-cols-[120px_1fr]
         gap-6
         items-start
@@ -32,6 +33,10 @@ export default function ProductGallery({
           flex
           lg:flex-col
           gap-4
+          max-w-full
+          overflow-x-auto
+          pb-1
+          scrollbar-hide
           order-2
           lg:order-1
         "
@@ -43,10 +48,14 @@ export default function ProductGallery({
             className={`
               relative
 
-              w-24
-              h-24
+              h-[4.25rem]
+              w-[4.25rem]
+              shrink-0
+              sm:h-24
+              sm:w-24
 
-              rounded-[22px]
+              rounded-[16px]
+              sm:rounded-[22px]
               overflow-hidden
 
               border-2
@@ -64,7 +73,7 @@ export default function ProductGallery({
               src={image}
               alt={`${title} thumbnail ${index + 1}`}
               fill
-              sizes="96px"
+              sizes="(min-width: 640px) 96px, 68px"
               className="
                 object-cover
                 hover:scale-105
@@ -82,7 +91,8 @@ export default function ProductGallery({
           relative
           aspect-[4/5]
 
-          rounded-[32px]
+          rounded-[22px]
+          sm:rounded-[32px]
           overflow-hidden
 
           bg-[var(--surface-muted)]

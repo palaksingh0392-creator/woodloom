@@ -7,6 +7,7 @@ import { useMemo, useState } from "react";
 import { SlidersHorizontal } from "lucide-react";
 
 import type { Product } from "@/data/products";
+import { parsePriceAmount } from "@/lib/price";
 
 type SortOption = "featured" | "price-low" | "price-high";
 
@@ -14,10 +15,6 @@ type FurnitureProductGridProps = {
   products: Product[];
   filters: string[];
 };
-
-function parsePrice(price: string) {
-  return Number(price.replace(/[^\d.]/g, ""));
-}
 
 function matchesFilter(product: Product, filter: string) {
   const haystack = [
@@ -49,11 +46,11 @@ export default function FurnitureProductGrid({
 
     return filteredProducts.slice().sort((first, second) => {
       if (sort === "price-low") {
-        return parsePrice(first.price) - parsePrice(second.price);
+        return parsePriceAmount(first.price) - parsePriceAmount(second.price);
       }
 
       if (sort === "price-high") {
-        return parsePrice(second.price) - parsePrice(first.price);
+        return parsePriceAmount(second.price) - parsePriceAmount(first.price);
       }
 
       return 0;

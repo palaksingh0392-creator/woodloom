@@ -51,10 +51,10 @@ const collections = [
 
 export default function CuratedCollections() {
   return (
-    <section className="py-20 border-t border-[var(--border)]">
-      <div className="max-w-[1600px] mx-auto px-6 lg:px-10">
+    <section className="overflow-hidden border-t border-[var(--border)] py-16 sm:py-20">
+      <div className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-10">
         {/* HEADER */}
-        <div className="flex items-center justify-between mb-10">
+        <div className="mb-10 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p
               className="
@@ -71,6 +71,7 @@ export default function CuratedCollections() {
             <h2
               className="
                 text-4xl
+                max-[360px]:text-[2rem]
                 lg:text-[52px]
                 leading-[0.95]
                 tracking-normal
@@ -102,12 +103,16 @@ export default function CuratedCollections() {
 
         {/* SWIPER */}
         <Swiper
-          spaceBetween={20}
+          spaceBetween={16}
           grabCursor={true}
-          slidesPerView={1.2}
+          slidesPerView={1.03}
+          resistanceRatio={0.7}
+          threshold={6}
+          watchOverflow={true}
           breakpoints={{
             640: {
               slidesPerView: 2.2,
+              spaceBetween: 20,
             },
 
             1024: {
@@ -118,6 +123,7 @@ export default function CuratedCollections() {
               slidesPerView: 5,
             },
           }}
+          className="mobile-swiper-rail"
         >
           {collections.map((item) => (
             <SwiperSlide key={item.title}>
@@ -132,7 +138,7 @@ export default function CuratedCollections() {
                 "
               >
                 {/* IMAGE */}
-                <div className="relative h-[300px]">
+                <div className="relative h-[240px] sm:h-[300px]">
                   <Image
                     src={item.image}
                     alt={item.title}
@@ -152,6 +158,7 @@ export default function CuratedCollections() {
                   <h3
                     className="
                       text-[26px]
+                      max-[360px]:text-[22px]
                       mb-2
                       text-[var(--text-primary)]
                     "

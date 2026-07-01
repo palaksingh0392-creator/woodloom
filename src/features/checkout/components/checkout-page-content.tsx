@@ -189,16 +189,18 @@ export default function CheckoutPageContent({
         <div className="grid gap-8">
           <section
             className="
-              rounded-[28px]
+              rounded-[22px]
+              sm:rounded-[28px]
               border
               border-[var(--border)]
               bg-[var(--surface)]
-              p-8
+              p-5
+              sm:p-8
             "
           >
             <div className="flex items-center gap-3 mb-8">
               <MapPin size={22} />
-              <h2 className="text-3xl font-serif">Delivery Address</h2>
+              <h2 className="font-serif text-2xl sm:text-3xl">Delivery Address</h2>
             </div>
 
             {savedAddresses.length > 0 ? (
@@ -354,16 +356,18 @@ export default function CheckoutPageContent({
 
           <section
             className="
-              rounded-[28px]
+              rounded-[22px]
+              sm:rounded-[28px]
               border
               border-[var(--border)]
               bg-[var(--surface)]
-              p-8
+              p-5
+              sm:p-8
             "
           >
             <div className="flex items-center gap-3 mb-8">
               <CreditCard size={22} />
-              <h2 className="text-3xl font-serif">Payment Method</h2>
+              <h2 className="font-serif text-2xl sm:text-3xl">Payment Method</h2>
             </div>
 
             <div className="grid gap-4">
@@ -433,18 +437,20 @@ export default function CheckoutPageContent({
 
         <aside
           className="
-            sticky
+            lg:sticky
             top-32
-            rounded-[28px]
+            rounded-[22px]
+            sm:rounded-[28px]
             border
             border-[var(--border)]
             bg-[var(--surface)]
-            p-8
+            p-5
+            sm:p-8
           "
         >
           <div className="flex items-center gap-3 mb-8">
             <ShieldCheck size={22} />
-            <h2 className="text-3xl font-serif">Order Summary</h2>
+            <h2 className="font-serif text-2xl sm:text-3xl">Order Summary</h2>
           </div>
 
           <div className="grid gap-5 mb-8">

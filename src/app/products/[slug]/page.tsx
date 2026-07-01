@@ -72,6 +72,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
             sm:px-6
             lg:px-10
             grid
+            min-w-0
             lg:grid-cols-2
             gap-10
             lg:gap-14

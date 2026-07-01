@@ -38,10 +38,14 @@ async function getDbProducts() {
 }
 
 function mapDbProduct(product: DbProduct): Product {
+  const catalogCategory = categories.find(
+    (category) => category.slug === product.category.slug,
+  );
+
   return {
     slug: product.slug,
     title: product.name,
-    category: product.category.name.replace(" Furniture", ""),
+    category: catalogCategory?.productCategory ?? product.category.name,
     collection: product.collection?.name ?? "WOODLOOM Collection",
     material: product.material ?? "Premium solid wood",
     dimensions: product.dimensions ?? "Made to order",

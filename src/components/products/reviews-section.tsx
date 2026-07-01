@@ -91,8 +91,8 @@ export default function ReviewsSection({
   }
 
   return (
-    <section className="pt-28 pb-10">
-      <div className="mx-auto max-w-[1440px] px-6 lg:px-10">
+    <section className="pt-20 pb-10 sm:pt-24 lg:pt-28">
+      <div className="mx-auto max-w-[1440px] px-5 sm:px-6 lg:px-10">
         <div className="mb-14 flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="mb-4 text-sm uppercase tracking-[3px] text-[var(--primary)]">
@@ -125,22 +125,22 @@ export default function ReviewsSection({
           </div>
         </div>
 
-        <div className="grid gap-8 lg:grid-cols-[1fr_420px]">
-          <div className="grid gap-8 lg:grid-cols-2">
+        <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_360px] xl:grid-cols-[minmax(0,1fr)_390px] lg:gap-8">
+          <div className="grid gap-5 md:grid-cols-2 lg:gap-6">
             {visibleReviews.map((review) => (
               <article
                 key={review.id}
-                className="rounded-[28px] border border-[var(--border)] bg-[var(--surface)] p-8 transition-all duration-500 hover:-translate-y-1"
+                className="flex max-w-full flex-col rounded-[22px] border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[0_18px_50px_var(--shadow-soft)] transition-all duration-500 hover:-translate-y-1 sm:rounded-[24px] sm:p-6 lg:min-h-[260px] lg:p-6"
               >
-                <div className="mb-6">
+                <div className="mb-5">
                   <RatingStars rating={review.rating} />
                 </div>
 
-                <p className="mb-8 text-[17px] leading-relaxed text-[var(--text-secondary)]">
+                <p className="mb-6 break-words text-[15px] leading-relaxed text-[var(--text-secondary)] sm:text-[16px]">
                   &ldquo;{review.content}&rdquo;
                 </p>
 
-                <div>
+                <div className="mt-auto border-t border-[var(--border)] pt-5">
                   <h4 className="mb-1 text-lg font-medium">
                     {review.customerName}
                   </h4>
@@ -153,8 +153,8 @@ export default function ReviewsSection({
             ))}
           </div>
 
-          <aside className="rounded-[28px] border border-[var(--border)] bg-[var(--surface)] p-8">
-            <h3 className="mb-3 text-3xl leading-tight">Share Your Review</h3>
+          <aside className="w-full max-w-full rounded-[22px] border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[0_18px_50px_var(--shadow-soft)] sm:rounded-[28px] sm:p-7 lg:sticky lg:top-28 lg:p-7">
+            <h3 className="mb-3 text-2xl leading-tight sm:text-3xl">Share Your Review</h3>
             <p className="mb-6 text-sm leading-relaxed text-[var(--text-secondary)]">
               Tell other customers how this piece fits your home.
             </p>
@@ -166,10 +166,14 @@ export default function ReviewsSection({
                   <select
                     value={rating}
                     onChange={(event) => setRating(Number(event.target.value))}
-                    className="h-12 rounded-full border border-[var(--border)] bg-transparent px-4 outline-none focus:border-[var(--primary)]"
+                    className="h-12 rounded-full border border-[var(--border)] bg-[var(--surface)] px-4 text-[var(--text-primary)] outline-none focus:border-[var(--primary)]"
                   >
                     {[5, 4, 3, 2, 1].map((value) => (
-                      <option key={value} value={value}>
+                      <option
+                        key={value}
+                        value={value}
+                        className="bg-[var(--surface)] text-[var(--text-primary)]"
+                      >
                         {value} star{value === 1 ? "" : "s"}
                       </option>
                     ))}

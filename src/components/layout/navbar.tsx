@@ -33,15 +33,16 @@ export default function Navbar() {
             lg:h-24
 
             grid
-            grid-cols-[1fr_auto]
+            grid-cols-[minmax(0,1fr)_auto]
             lg:grid-cols-3
 
             items-center
-            gap-4
+            gap-3
+            sm:gap-4
           "
         >
           {/* LEFT */}
-          <div>
+          <div className="min-w-0">
             <Link
               href="/"
               className="
@@ -53,6 +54,7 @@ export default function Navbar() {
               <span
                 className="
                   text-[1.5rem]
+                  max-[380px]:text-[1.25rem]
                   sm:text-[2rem]
                   font-bold
                   tracking-tight
@@ -64,7 +66,8 @@ export default function Navbar() {
               <span
                 className="
                   text-[10px]
-                  tracking-[4px]
+                  max-[380px]:hidden
+                  tracking-[0.28em]
                   uppercase
 
                   text-muted
@@ -100,7 +103,11 @@ export default function Navbar() {
 
             <Link href="/furniture">Collections</Link>
 
-            <Link href="/blog">Blog</Link>
+           <Link
+                href="/blog"
+              >
+               Blog
+              </Link>
           </nav>
 
           {/* RIGHT */}
@@ -110,13 +117,14 @@ export default function Navbar() {
               items-center
               justify-end
               gap-3
+              max-[380px]:gap-2
               sm:gap-5
             "
           >
             <Link
               href="/search"
               aria-label="Search"
-              className="hidden sm:block"
+              className="hidden h-10 w-10 items-center justify-center rounded-full transition-colors hover:bg-[var(--surface-muted)] sm:flex"
             >
               <Search size={22} />
             </Link>
@@ -124,7 +132,7 @@ export default function Navbar() {
             <Link
               href="/account"
               aria-label="Account"
-              className="hidden sm:block"
+              className="hidden h-10 w-10 items-center justify-center rounded-full transition-colors hover:bg-[var(--surface-muted)] sm:flex"
             >
               <User size={22} />
             </Link>
@@ -133,11 +141,16 @@ export default function Navbar() {
               href="/admin-login"
               aria-label="Admin login"
               title="Admin login"
+              className="flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:bg-[var(--surface-muted)] sm:h-10 sm:w-10"
             >
               <ShieldCheck size={22} />
             </Link>
 
-            <Link href="/wishlist" aria-label="Wishlist" className="relative">
+            <Link
+              href="/wishlist"
+              aria-label="Wishlist"
+              className="relative flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:bg-[var(--surface-muted)] sm:h-10 sm:w-10"
+            >
               <Heart size={22} />
 
               {wishlistCount > 0 && (
@@ -167,7 +180,11 @@ export default function Navbar() {
               )}
             </Link>
 
-            <Link href="/cart" aria-label="Cart" className="relative">
+            <Link
+              href="/cart"
+              aria-label="Cart"
+              className="relative flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:bg-[var(--surface-muted)] sm:h-10 sm:w-10"
+            >
               <ShoppingBag size={22} />
 
               {cartCount > 0 && (
@@ -200,6 +217,21 @@ export default function Navbar() {
             <ThemeToggle />
           </div>
         </div>
+
+        <nav className="flex h-11 items-center gap-5 overflow-x-auto border-t text-sm font-medium text-[var(--text-secondary)] scrollbar-hide lg:hidden">
+          <Link href="/products" className="shrink-0 hover:text-[var(--text-primary)]">
+            Products
+          </Link>
+          <Link href="/furniture" className="shrink-0 hover:text-[var(--text-primary)]">
+            Collections
+          </Link>
+          <Link href="/blog" className="shrink-0 hover:text-[var(--text-primary)]">
+            Blog
+          </Link>
+          <Link href="/search" className="shrink-0 hover:text-[var(--text-primary)]">
+            Search
+          </Link>
+        </nav>
       </Container>
     </header>
   );

@@ -43,7 +43,8 @@ export default function HeroSection() {
         className="
           relative
 
-          min-h-[620px]
+          min-h-[560px]
+          sm:min-h-[620px]
           lg:h-[720px]
 
           overflow-hidden
@@ -77,12 +78,13 @@ export default function HeroSection() {
                 fill
                 sizes="100vw"
                 priority
-                className="object-cover object-center brightness-[0.88] contrast-[1.05]"
+                className="object-cover object-center brightness-[0.96] contrast-[1.08] saturate-[1.03]"
               />
             </div>
           ))}
         </div>
-        <div className="absolute inset-0 bg-gradient-to-r from-[var(--hero-scrim)] via-[var(--hero-scrim)]/55 to-transparent z-10" />
+        <div className="absolute inset-0 z-10 bg-gradient-to-r from-[var(--hero-scrim)] via-[var(--hero-scrim)]/28 to-transparent" />
+        <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/20 via-transparent to-black/10" />
         {/* LEFT OVERLAY */}
 
         {/* SOFT SHADOW DEPTH */}
@@ -117,11 +119,14 @@ export default function HeroSection() {
             className="
               inline-block
 
-              mb-5
+              mb-4
+              sm:mb-5
               lg:mb-8
 
-              text-[13px]
-              tracking-[0.35em]
+              text-[11px]
+              sm:text-[13px]
+              tracking-[0.22em]
+              sm:tracking-[0.35em]
               uppercase
 
               text-[var(--primary)]
@@ -135,7 +140,9 @@ export default function HeroSection() {
             className="
               max-w-[11ch]
 
-              text-[46px]
+              text-[40px]
+              max-[360px]:text-[34px]
+              min-[390px]:text-[44px]
               sm:text-[64px]
               lg:text-[85px]
               leading-[0.92]
@@ -156,10 +163,11 @@ export default function HeroSection() {
           {/* DESCRIPTION */}
           <p
             className="
-              max-w-130
+              max-w-[32rem]
 
-              text-[17px]
-              sm:text-[21px]
+              text-[15px]
+              sm:text-[19px]
+              lg:text-[21px]
               leading-[1.7]
               lg:leading-[1.9]
 
@@ -179,9 +187,10 @@ export default function HeroSection() {
               href="/furniture"
               className="
                 inline-flex
-                h-14
+                min-h-14
                 lg:h-16
-                px-7
+                px-6
+                max-[360px]:px-5
                 lg:px-10
                 items-center
                 justify-center
@@ -191,8 +200,10 @@ export default function HeroSection() {
                 bg-[var(--text-primary)]
                 text-[var(--background)]
 
-                text-[13px]
-                tracking-[0.18em]
+                text-[12px]
+                sm:text-[13px]
+                tracking-[0.12em]
+                sm:tracking-[0.18em]
                 uppercase
 
                 transition-all
@@ -204,23 +215,30 @@ export default function HeroSection() {
               Explore Collection
             </Link>
 
-            <button
+            <Link
+              href="/contact"
               className="
-                h-14
+                inline-flex
+                min-h-14
                 lg:h-16
-                px-7
+                px-6
+                max-[360px]:px-5
                 lg:px-10
+                items-center
+                justify-center
 
                 rounded-full
 
                 border
-                border-[var(--border)]
+                border-[var(--text-primary)]/15
 
-                bg-[var(--surface-overlay)]
+                bg-[var(--surface-overlay)]/72
                 backdrop-blur-md
 
-                text-[13px]
-                tracking-[0.18em]
+                text-[12px]
+                sm:text-[13px]
+                tracking-[0.12em]
+                sm:tracking-[0.18em]
                 uppercase
 
                 transition-all
@@ -230,7 +248,7 @@ export default function HeroSection() {
               "
             >
               Book Consultation
-            </button>
+            </Link>
           </div>
 
           {/* CAROUSEL INDICATORS */}
@@ -312,6 +330,8 @@ export default function HeroSection() {
 
           -top-24
           -right-20
+          hidden
+          sm:block
 
           w-80
           h-80

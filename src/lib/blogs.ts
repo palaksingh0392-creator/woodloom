@@ -15,6 +15,14 @@ export type AdminBlogInput = {
   isPublished: boolean;
 };
 
+const fallbackBlogImage =
+  "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?q=80&w=1400&auto=format&fit=crop";
+
+const allowedBlogImageHosts = new Set([
+  "images.unsplash.com",
+  "res.cloudinary.com",
+]);
+
 function optionalText(value: unknown) {
   const text = typeof value === "string" ? value.trim() : "";
   return text || undefined;
@@ -33,6 +41,50 @@ function formatDate(value: Date | null) {
   });
 }
 
+function resolveBlogImage(imageUrl?: string | null) {
+  if (!imageUrl) {
+    return fallbackBlogImage;
+  }
+
+  if (imageUrl.startsWith("/")) {
+    return imageUrl;
+  }
+
+  try {
+    const url = new URL(imageUrl);
+
+    if (url.protocol === "https:" && allowedBlogImageHosts.has(url.hostname)) {
+      return imageUrl;
+    }
+  } catch {
+    return fallbackBlogImage;
+  }
+
+  return fallbackBlogImage;
+}
+
+function validateBlogImageUrl(imageUrl?: string) {
+  if (!imageUrl) {
+    return undefined;
+  }
+
+  if (imageUrl.startsWith("/")) {
+    return imageUrl;
+  }
+
+  try {
+    const url = new URL(imageUrl);
+
+    if (url.protocol === "https:" && allowedBlogImageHosts.has(url.hostname)) {
+      return imageUrl;
+    }
+  } catch {
+    throw new Error("Use a valid image URL.");
+  }
+
+  throw new Error("Use an image from Unsplash or Cloudinary.");
+}
+
 function mapDbBlogPost(post: {
   slug: string;
   title: string;
@@ -49,9 +101,7 @@ function mapDbBlogPost(post: {
     category: post.author,
     date: formatDate(post.publishedAt ?? post.createdAt),
     excerpt: post.excerpt,
-    image:
-      post.imageUrl ??
-      "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?q=80&w=1400&auto=format&fit=crop",
+    image: resolveBlogImage(post.imageUrl),
     readTime: estimateReadTime(post.content),
     content: post.content
       .split(/\n{2,}/)
@@ -80,7 +130,7 @@ export function parseAdminBlogInput(body: unknown): AdminBlogInput {
     slug: slugifyProductName(optionalText(input.slug) ?? title),
     excerpt,
     content,
-    imageUrl: optionalText(input.imageUrl),
+    imageUrl: validateBlogImageUrl(optionalText(input.imageUrl)),
     author,
     isPublished: Boolean(input.isPublished),
   };

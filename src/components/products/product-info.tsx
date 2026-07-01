@@ -49,7 +49,7 @@ export default function ProductInfo({ product }: ProductInfoProps) {
   ];
 
   return (
-    <div className="pt-4">
+    <div className="min-w-0 pt-4">
       <p
         className="
           uppercase
@@ -130,13 +130,14 @@ export default function ProductInfo({ product }: ProductInfoProps) {
           Finish
         </p>
 
-        <div className="flex flex-wrap gap-4">
+        <div className="flex flex-wrap gap-3 sm:gap-4">
           {product.finishes.map((finish) => (
             <button
               key={finish}
               onClick={() => setSelectedFinish(finish)}
               className={`
-                px-5
+                px-4
+                sm:px-5
                 py-3
                 rounded-full
                 border
@@ -253,6 +254,8 @@ export default function ProductInfo({ product }: ProductInfoProps) {
             border
             border-[var(--border)]
             flex
+            self-start
+            sm:self-auto
             items-center
             justify-center
             hover:border-[var(--primary)]
@@ -307,6 +310,7 @@ export default function ProductInfo({ product }: ProductInfoProps) {
               }
               className="
                 w-full
+                max-w-full
                 flex
                 items-center
                 justify-between

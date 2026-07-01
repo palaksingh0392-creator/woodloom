@@ -2,6 +2,8 @@
 
 import { useSyncExternalStore } from "react";
 
+import { parsePriceAmount } from "@/lib/price";
+
 const STORAGE_KEY = "woodloom-commerce";
 
 export type CartItem = {
@@ -316,7 +318,7 @@ export const commerceActions = {
 
 export function calculateCartTotals(cartItems: CartItem[]) {
   const subtotal = cartItems.reduce(
-    (total, item) => total + parsePrice(item.price) * item.quantity,
+    (total, item) => total + parsePriceAmount(item.price) * item.quantity,
     0,
   );
   const deliveryCharge = subtotal >= 50000 || subtotal === 0 ? 0 : 999;
@@ -332,10 +334,6 @@ export function formatPrice(value: number) {
   return `Rs. ${new Intl.NumberFormat("en-IN", {
     maximumFractionDigits: 0,
   }).format(value)}`;
-}
-
-function parsePrice(price: string) {
-  return Number(price.replace(/[^\d.]/g, ""));
 }
 
 export function useCartCount() {

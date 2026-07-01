@@ -3,6 +3,7 @@ import { PrismaClient } from "@prisma/client";
 
 import { categories } from "../src/data/categories";
 import { products } from "../src/data/products";
+import { parsePriceAmount } from "../src/lib/price";
 
 const databaseUrl =
   process.env.DATABASE_URL ??
@@ -11,10 +12,6 @@ const databaseUrl =
 const prisma = new PrismaClient({
   adapter: new PrismaMssql(databaseUrl),
 });
-
-function priceToDecimal(price: string) {
-  return Number(price.replace(/[^\d.]/g, ""));
-}
 
 async function main() {
   for (const category of categories) {
@@ -79,9 +76,9 @@ async function main() {
         dimensions: product.dimensions,
         careInstructions: product.careInstructions,
         warranty: product.warranty,
-        price: priceToDecimal(product.price),
+        price: parsePriceAmount(product.price),
         compareAtPrice: product.compareAtPrice
-          ? priceToDecimal(product.compareAtPrice)
+          ? parsePriceAmount(product.compareAtPrice)
           : null,
         status: "ACTIVE",
         isFeatured: true,
@@ -99,9 +96,9 @@ async function main() {
         dimensions: product.dimensions,
         careInstructions: product.careInstructions,
         warranty: product.warranty,
-        price: priceToDecimal(product.price),
+        price: parsePriceAmount(product.price),
         compareAtPrice: product.compareAtPrice
-          ? priceToDecimal(product.compareAtPrice)
+          ? parsePriceAmount(product.compareAtPrice)
           : null,
         status: "ACTIVE",
         isFeatured: true,
