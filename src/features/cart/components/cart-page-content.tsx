@@ -18,12 +18,12 @@ export default function CartPageContent() {
 
   if (cartItems.length === 0) {
     return (
-      <div className="max-w-[1440px] mx-auto px-5 sm:px-6 lg:px-10 py-20 lg:py-24">
-        <p className="uppercase tracking-[4px] text-sm text-[var(--primary)] mb-4">
+      <div className="mx-auto max-w-[1440px] px-4 py-14 sm:px-6 lg:px-10 lg:py-24">
+        <p className="mb-4 text-sm uppercase tracking-[4px] text-[var(--primary)]">
           Your Cart
         </p>
 
-        <h1 className="text-4xl sm:text-5xl lg:text-7xl leading-[0.95] font-serif mb-8">
+        <h1 className="mb-8 text-4xl leading-[0.95] font-serif sm:text-5xl lg:text-7xl">
           Your Cart Is Empty
         </h1>
 
@@ -49,18 +49,18 @@ export default function CartPageContent() {
   }
 
   return (
-    <div className="max-w-[1440px] mx-auto px-5 sm:px-6 lg:px-10 py-14 lg:py-20">
-      <div className="mb-12">
-        <p className="uppercase tracking-[4px] text-sm text-[var(--primary)] mb-4">
+    <div className="mx-auto max-w-[1440px] px-4 py-14 sm:px-6 lg:px-10 lg:py-20">
+      <div className="mb-8 sm:mb-12">
+        <p className="mb-4 text-sm uppercase tracking-[4px] text-[var(--primary)]">
           Your Cart
         </p>
 
-        <h1 className="text-4xl sm:text-5xl lg:text-7xl leading-[0.95] font-serif">
+        <h1 className="text-4xl leading-[0.95] font-serif sm:text-5xl lg:text-7xl">
           Review Your Pieces
         </h1>
       </div>
 
-      <div className="grid lg:grid-cols-[1fr_420px] gap-12 items-start">
+      <div className="grid gap-8 lg:grid-cols-[1fr_420px] lg:items-start">
         <div className="grid gap-6">
           {cartItems.map((item) => (
             <article

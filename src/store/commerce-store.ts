@@ -4,7 +4,7 @@ import { useSyncExternalStore } from "react";
 
 import { parsePriceAmount } from "@/lib/price";
 
-const STORAGE_KEY = "woodloom-commerce";
+const STORAGE_KEY = "shissoo-commerce";
 
 export type CartItem = {
   productSlug: string;
@@ -12,6 +12,7 @@ export type CartItem = {
   price: string;
   image: string;
   finish: string;
+  grade?: string;
   quantity: number;
 };
 
@@ -26,15 +27,19 @@ export type CheckoutAddress = {
 };
 
 export type PaymentMethod = "cod" | "razorpay";
+export type PaymentPlan = "full" | "partial";
 
 export type OrderSnapshot = {
   orderNumber: string;
   items: CartItem[];
   address: CheckoutAddress;
   paymentMethod: PaymentMethod;
+  paymentPlan?: PaymentPlan;
   subtotal: number;
   deliveryCharge: number;
   total: number;
+  paidAmount?: number;
+  dueAmount?: number;
   createdAt: string;
 };
 

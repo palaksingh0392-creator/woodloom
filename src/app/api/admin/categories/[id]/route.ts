@@ -41,6 +41,13 @@ export async function DELETE(_request: Request, context: RouteContext) {
   }
 
   const { id } = await context.params;
+  const hardDelete = new URL(_request.url).searchParams.get("hard") === "true";
+
+  if (hardDelete) {
+    await prisma.category.delete({ where: { id } });
+    return NextResponse.json({ ok: true });
+  }
+
   const category = await prisma.category.update({
     where: { id },
     data: { isActive: false },

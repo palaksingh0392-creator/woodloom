@@ -5,18 +5,20 @@ import MainLayout from "@/components/layout/main-layout";
 import FurnitureProductGrid from "@/features/furniture/components/furniture-product-grid";
 import {
   getCatalogCategoryProductCount,
-  listCatalogCategories,
+  listStorefrontCategories,
   listCatalogProducts,
 } from "@/lib/catalog";
 
 export const metadata = {
-  title: "Furniture | WOODLOOM",
+  title: "Furniture | Shissoo",
   description:
-    "Explore premium wooden furniture by room, material, and finish from WOODLOOM.",
+    "Explore premium wooden furniture by room, material, and finish from Shissoo.",
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function FurniturePage() {
-  const categories = listCatalogCategories();
+  const categories = await listStorefrontCategories();
   const products = await listCatalogProducts();
   const categoryCounts = new Map(
     await Promise.all(

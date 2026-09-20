@@ -5,9 +5,11 @@ import MainLayout from "@/components/layout/main-layout";
 import { listCatalogProducts } from "@/lib/catalog";
 
 export const metadata = {
-  title: "Products | WOODLOOM",
-  description: "Explore premium wooden furniture from WOODLOOM.",
+  title: "Products | Shissoo",
+  description: "Explore premium wooden furniture from Shissoo.",
 };
+
+export const dynamic = "force-dynamic";
 
 export default async function ProductsPage() {
   const products = await listCatalogProducts();
@@ -35,7 +37,7 @@ export default async function ProductsPage() {
               mb-4
             "
           >
-            WOODLOOM Collection
+            Shissoo Collection
           </p>
 
           <h1

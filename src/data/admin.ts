@@ -9,15 +9,20 @@ export type AdminOrder = {
   item: string;
   items?: {
     productName: string;
+    productCode?: string;
     sku: string;
     quantity: number;
     total: string;
   }[];
   address?: string;
   total: string;
-  payment: "Paid" | "COD" | "Pending";
+  paidAmount?: string;
+  dueAmount?: string;
+  paymentPlan?: string;
+  payment: "Paid" | "COD" | "Pending" | "Partial";
   paymentMethod?: string;
   paymentStatus?: string;
+  refundTransactionId?: string | null;
   returnRequest?: {
     status: string;
     reason: string;

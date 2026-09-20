@@ -4,29 +4,34 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
-  ImagePlus,
   Plus,
   Save,
   Trash2,
   Upload,
 } from "lucide-react";
 
-type Option = { id: string; name: string };
+import { readAdminResponse } from "./read-admin-response";
+
+type Option = { id: string; name: string; categoryId?: string };
 type Variant = {
   id?: string;
   finish: string;
+  grade: string;
   color: string;
   sku: string;
   stock: number;
   reorderAt: number;
+  priceAdjustment: number;
 };
 
 export type ProductFormValue = {
   id?: string;
   name: string;
   slug: string;
+  productCode: string;
   sku: string;
   categoryId: string;
+  subcategoryId: string;
   collectionId: string;
   shortDescription: string;
   description: string;
@@ -45,24 +50,29 @@ export type ProductFormValue = {
 
 type Props = {
   categories: Option[];
+  subcategories: Option[];
   collections: Option[];
   initialValue?: ProductFormValue;
 };
 
 const emptyVariant: Variant = {
   finish: "",
+  grade: "",
   color: "",
   sku: "",
   stock: 0,
   reorderAt: 5,
+  priceAdjustment: 0,
 };
 
 function createInitialValue(categories: Option[]): ProductFormValue {
   return {
     name: "",
     slug: "",
+    productCode: "",
     sku: "",
     categoryId: categories[0]?.id ?? "",
+    subcategoryId: "",
     collectionId: "",
     shortDescription: "",
     description: "",
@@ -86,6 +96,7 @@ const labelClass = "block text-sm font-semibold text-[var(--text-primary)]";
 
 export default function AdminProductForm({
   categories,
+  subcategories,
   collections,
   initialValue,
 }: Props) {
@@ -93,11 +104,13 @@ export default function AdminProductForm({
   const [value, setValue] = useState<ProductFormValue>(
     initialValue ?? createInitialValue(categories),
   );
-  const [imageUrl, setImageUrl] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [message, setMessage] = useState("");
   const isEditing = Boolean(value.id);
+  const availableSubcategories = subcategories.filter(
+    (subcategory) => subcategory.categoryId === value.categoryId,
+  );
   const totalStock = useMemo(
     () => value.variants.reduce((sum, variant) => sum + Number(variant.stock), 0),
     [value.variants],
@@ -119,13 +132,6 @@ export default function AdminProductForm({
     }));
   }
 
-  function addImageUrl() {
-    const url = imageUrl.trim();
-    if (!url || value.imageUrls.includes(url)) return;
-    updateField("imageUrls", [...value.imageUrls, url]);
-    setImageUrl("");
-  }
-
   async function uploadImage(file: File | undefined) {
     if (!file) return;
     setIsUploading(true);
@@ -139,7 +145,9 @@ export default function AdminProductForm({
         method: "POST",
         body: formData,
       });
-      const result = (await response.json()) as { url?: string; message?: string };
+      const result = await readAdminResponse<{ url?: string; message?: string }>(
+        response,
+      );
 
       if (!response.ok || !result.url) {
         throw new Error(result.message ?? "Image upload failed.");
@@ -167,10 +175,10 @@ export default function AdminProductForm({
           body: JSON.stringify(value),
         },
       );
-      const result = (await response.json()) as {
+      const result = await readAdminResponse<{
         product?: { id: string };
         message?: string;
-      };
+      }>(response);
 
       if (!response.ok || !result.product) {
         throw new Error(result.message ?? "Could not save product.");
@@ -244,13 +252,39 @@ export default function AdminProductForm({
                 />
               </label>
               <label className={labelClass}>
-                Product SKU
+                Product code
                 <input
                   required
-                  value={value.sku}
-                  onChange={(event) => updateField("sku", event.target.value)}
+                  value={value.productCode}
+                  onChange={(event) => {
+                    const productCode = event.target.value;
+                    setValue((current) => ({
+                      ...current,
+                      productCode,
+                      sku: productCode,
+                    }));
+                  }}
+                  placeholder="e.g. SHS-NLC-001"
                   className={fieldClass}
                 />
+              </label>
+              <label className={labelClass}>
+                Sub-category
+                <select
+                  value={value.subcategoryId}
+                  onChange={(event) => updateField("subcategoryId", event.target.value)}
+                  className={fieldClass}
+                  disabled={availableSubcategories.length === 0}
+                >
+                  <option value="">
+                    {availableSubcategories.length ? "No sub-category" : "No sub-categories available"}
+                  </option>
+                  {availableSubcategories.map((subcategory) => (
+                    <option key={subcategory.id} value={subcategory.id}>
+                      {subcategory.name}
+                    </option>
+                  ))}
+                </select>
               </label>
               <label className={labelClass}>
                 Category
@@ -377,6 +411,13 @@ export default function AdminProductForm({
                     }
                   />
                   <SmallField
+                    label="Grade (optional)"
+                    value={variant.grade}
+                    onChange={(nextValue) =>
+                      updateVariant(index, { grade: nextValue })
+                    }
+                  />
+                  <SmallField
                     label="Color"
                     value={variant.color}
                     onChange={(nextValue) =>
@@ -384,7 +425,7 @@ export default function AdminProductForm({
                     }
                   />
                   <SmallField
-                    label="Variant SKU"
+                    label="Variant product code"
                     value={variant.sku}
                     onChange={(nextValue) => updateVariant(index, { sku: nextValue })}
                   />
@@ -404,6 +445,15 @@ export default function AdminProductForm({
                     value={variant.reorderAt}
                     onChange={(nextValue) =>
                       updateVariant(index, { reorderAt: Number(nextValue) })
+                    }
+                  />
+                  <SmallField
+                    label="Grade price +"
+                    type="number"
+                    min={0}
+                    value={variant.priceAdjustment}
+                    onChange={(nextValue) =>
+                      updateVariant(index, { priceAdjustment: Number(nextValue) })
                     }
                   />
                   <button
@@ -500,22 +550,8 @@ export default function AdminProductForm({
               />
             </label>
 
-            <div className="flex gap-2">
-              <input
-                type="url"
-                value={imageUrl}
-                onChange={(event) => setImageUrl(event.target.value)}
-                placeholder="Or paste image URL"
-                className={`${fieldClass} mt-0`}
-              />
-              <button
-                type="button"
-                title="Add image URL"
-                onClick={addImageUrl}
-                className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-md border border-[var(--border)]"
-              >
-                <ImagePlus size={18} />
-              </button>
+            <div className="rounded-md border border-dashed border-[var(--border)] p-3 text-sm text-[var(--text-secondary)]">
+              Direct upload only. Select an image from your device to add it instantly.
             </div>
 
             <div className="grid grid-cols-2 gap-3">

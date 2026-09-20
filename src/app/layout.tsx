@@ -2,25 +2,16 @@ import "./globals.css";
 
 import type { Metadata } from "next";
 
-import { Playfair_Display, Manrope } from "next/font/google";
-
 import CommerceSyncProvider from "@/components/providers/commerce-sync-provider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
-
-const playfair = Playfair_Display({
-  subsets: ["latin"],
-  variable: "--font-heading",
-});
-
-const manrope = Manrope({
-  subsets: ["latin"],
-  variable: "--font-body",
-});
+import HoverLabels from "@/components/ui/hover-labels";
 
 export const metadata: Metadata = {
-  title: "WOODLOOM",
+  title: "Shissoo",
   description: "Luxury Scandinavian Furniture",
 };
+
+export const dynamic = "force-dynamic";
 
 export default function RootLayout({
   children,
@@ -32,14 +23,11 @@ export default function RootLayout({
       lang="en"
       suppressHydrationWarning
       data-scroll-behavior="smooth"
-      className={`
-        ${playfair.variable}
-        ${manrope.variable}
-      `}
     >
       <body>
         <ThemeProvider>
           <CommerceSyncProvider />
+          <HoverLabels />
           {children}
         </ThemeProvider>
       </body>

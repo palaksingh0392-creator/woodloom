@@ -1,6 +1,7 @@
 import "server-only";
 
 import { hasDatabaseUrl } from "@/lib/auth";
+import { createAdminNotification } from "@/lib/admin-notifications";
 import { prisma } from "@/lib/prisma";
 
 export type ProductReview = {
@@ -79,7 +80,17 @@ export async function createProductReview(input: {
     throw new Error("Product not found.");
   }
 
-  return prisma.review.upsert({
+  const existingReview = await prisma.review.findUnique({
+    where: {
+      userId_productId: {
+        userId: input.userId,
+        productId: product.id,
+      },
+    },
+    include: { user: true },
+  });
+
+  const review = await prisma.review.upsert({
     where: {
       userId_productId: {
         userId: input.userId,
@@ -101,6 +112,21 @@ export async function createProductReview(input: {
       isVisible: true,
     },
   });
+
+  if (!existingReview) {
+    try {
+      await createAdminNotification({
+        type: "REVIEW",
+        title: "New customer review",
+        message: `${review.title ?? "Review"} for ${product.name}.`,
+        href: "/admin/reviews",
+      });
+    } catch (error) {
+      console.warn("Could not create review notification:", error);
+    }
+  }
+
+  return review;
 }
 
 export async function listAdminProductReviews(): Promise<AdminProductReview[]> {

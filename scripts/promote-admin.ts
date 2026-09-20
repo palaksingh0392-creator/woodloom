@@ -24,6 +24,7 @@ async function main() {
     data: {
       role: "ADMIN",
       status: "ACTIVE",
+      emailVerifiedAt: new Date(),
     },
     select: {
       email: true,

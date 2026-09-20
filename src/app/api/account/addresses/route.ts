@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 
 import { listAccountAddresses } from "@/lib/account";
 import { hasDatabaseUrl } from "@/lib/auth";
+import { normalizePhone } from "@/lib/account-validation";
+import { findServiceableArea } from "@/lib/delivery-areas";
 import { prisma } from "@/lib/prisma";
 import { getCurrentSession } from "@/lib/session";
 
@@ -45,7 +47,7 @@ export async function POST(request: Request) {
     isDefault?: boolean;
   };
   const fullName = body.fullName?.trim();
-  const phone = body.phone?.trim();
+  const phone = normalizePhone(body.phone ?? "");
   const line1 = body.line1?.trim();
   const line2 = body.line2?.trim() || null;
   const city = body.city?.trim();
@@ -55,7 +57,19 @@ export async function POST(request: Request) {
 
   if (!fullName || !phone || !line1 || !city || !state || !postalCode) {
     return NextResponse.json(
-      { message: "All required address fields must be completed." },
+      { message: "Enter a valid phone number with exactly 10 digits after +91." },
+      { status: 400 },
+    );
+  }
+
+  const deliveryArea = await findServiceableArea({ state, city, pincode: postalCode });
+
+  if (!deliveryArea) {
+    return NextResponse.json(
+      {
+        message:
+          "Delivery is not available for this pincode. Please choose a supported state, city, and pincode.",
+      },
       { status: 400 },
     );
   }

@@ -2,13 +2,16 @@ import MainLayout from "@/components/layout/main-layout";
 import CheckoutPageContent from "@/features/checkout/components/checkout-page-content";
 import { listAccountAddresses } from "@/lib/account";
 import { listCatalogProducts } from "@/lib/catalog";
+import { isRazorpayConfigured } from "@/lib/razorpay";
 import { getCurrentSession } from "@/lib/session";
 import { redirect } from "next/navigation";
 
 export const metadata = {
-  title: "Checkout | WOODLOOM",
-  description: "Complete your WOODLOOM furniture order.",
+  title: "Checkout | Shissoo",
+  description: "Complete your Shissoo furniture order.",
 };
+
+export const dynamic = "force-dynamic";
 
 export default async function CheckoutPage() {
   const session = await getCurrentSession();
@@ -24,7 +27,11 @@ export default async function CheckoutPage() {
 
   return (
     <MainLayout>
-      <CheckoutPageContent products={products} savedAddresses={addresses} />
+      <CheckoutPageContent
+        products={products}
+        savedAddresses={addresses}
+        razorpayConfigured={isRazorpayConfigured()}
+      />
     </MainLayout>
   );
 }

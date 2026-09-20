@@ -3,6 +3,8 @@
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 
+import { isValidEmail } from "@/lib/account-validation";
+
 import AuthField from "./auth-field";
 
 export default function OtpLoginForm() {
@@ -15,30 +17,44 @@ export default function OtpLoginForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function requestOtp() {
-    setMessage("");
-    setIsSubmitting(true);
-
-    const response = await fetch("/api/auth/otp/request", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, purpose: "login" }),
-    });
-    const data = (await response.json()) as {
-      message?: string;
-      challenge?: string;
-      devOtp?: string;
-    };
-
-    setIsSubmitting(false);
-
-    if (!response.ok || !data.challenge) {
-      setMessage(data.message ?? "Unable to send OTP.");
+    if (!email.trim() || !isValidEmail(email)) {
+      setMessage("Enter a valid email address first.");
       return;
     }
 
-    setChallenge(data.challenge);
-    setDevOtp(data.devOtp ?? "");
-    setMessage("OTP sent. Check your email or use the local development code below.");
+    setMessage("");
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch("/api/auth/otp/request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, purpose: "login" }),
+      });
+      const data = (await response.json().catch(() => ({}))) as {
+        message?: string;
+        challenge?: string;
+        devOtp?: string;
+      };
+
+      setIsSubmitting(false);
+
+      if (!response.ok || !data.challenge) {
+        setMessage(data.message ?? "Unable to send OTP.");
+        return;
+      }
+
+      setChallenge(data.challenge);
+      setDevOtp(data.devOtp ?? "");
+      setMessage(
+        data.devOtp
+          ? "OTP created in local mode. Use the local development code below."
+          : "OTP sent. Please check your email.",
+      );
+    } catch {
+      setIsSubmitting(false);
+      setMessage("OTP email could not be sent. Please try again.");
+    }
   }
 
   async function verifyOtp(event: FormEvent<HTMLFormElement>) {

@@ -3,8 +3,8 @@ import PolicySection from "@/components/shared/policy-section";
 import StaticPage from "@/components/shared/static-page";
 
 export const metadata = {
-  title: "Return Policy | WOODLOOM",
-  description: "WOODLOOM return and replacement policy.",
+  title: "Return Policy | Shissoo",
+  description: "Shissoo return and replacement policy.",
 };
 
 export default function ReturnPolicyPage() {

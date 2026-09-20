@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import Image from "next/image";
 import { Play, X } from "lucide-react";
 
@@ -38,7 +39,6 @@ export default function OurStorySection() {
                 className="
                   mb-5
                   text-xs
-                  font-medium
                   uppercase
                   tracking-[4px]
                   text-[var(--primary)]
@@ -78,8 +78,8 @@ export default function OurStorySection() {
                 crafted using premium wood and timeless techniques.
               </p>
 
-              <button
-                onClick={() => setIsOpen(true)}
+              <Link
+                href="/blog"
                 className="
                   mt-10
                   flex
@@ -87,7 +87,6 @@ export default function OurStorySection() {
                   gap-3
 
                   text-sm
-                  font-medium
                   uppercase
                   tracking-[2px]
                   text-[var(--text-primary)]
@@ -100,7 +99,7 @@ export default function OurStorySection() {
               >
                 Read Our Story
                 <span>→</span>
-              </button>
+              </Link>
             </div>
 
             {/* RIGHT VIDEO */}
@@ -227,7 +226,7 @@ export default function OurStorySection() {
               <iframe
                 className="h-full w-full"
                 src="https://www.youtube.com/embed/8Qn_spdM5Zg?autoplay=1"
-                title="Woodloom Story"
+                title="Shissoo Story"
                 allow="autoplay; encrypted-media"
                 allowFullScreen
               />

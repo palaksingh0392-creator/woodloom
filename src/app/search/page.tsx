@@ -5,9 +5,9 @@ import SearchPageContent from "@/features/search/components/search-page-content"
 import { listCatalogCategories, listCatalogProducts } from "@/lib/catalog";
 
 export const metadata = {
-  title: "Search | WOODLOOM",
+  title: "Search | Shissoo",
   description:
-    "Search premium wooden furniture, room categories, materials, and finishes from WOODLOOM.",
+    "Search premium wooden furniture, room categories, materials, and finishes from Shissoo.",
 };
 
 export default async function SearchPage() {

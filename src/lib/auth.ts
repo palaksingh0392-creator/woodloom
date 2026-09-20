@@ -1,5 +1,7 @@
 import { createHmac, pbkdf2Sync, randomBytes, timingSafeEqual } from "crypto";
 
+import { normalizeEmail, normalizePhone } from "@/lib/account-validation";
+
 export const userRoles = ["CUSTOMER", "ADMIN", "STAFF"] as const;
 
 export type UserRole = (typeof userRoles)[number];
@@ -29,6 +31,74 @@ export function hasDatabaseUrl() {
   return Boolean(databaseUrl && !databaseUrl.includes("YOUR_PASSWORD"));
 }
 
+export function getLoginLookupCandidates(input: {
+  identifier?: unknown;
+  email?: unknown;
+  phone?: unknown;
+}) {
+  const identifier = typeof input.identifier === "string" ? input.identifier.trim() : "";
+  const email = typeof input.email === "string" ? input.email.trim() : "";
+  const phone = typeof input.phone === "string" ? input.phone.trim() : "";
+
+  const preferred = identifier || email || phone;
+
+  if (!preferred) {
+    return [] as string[];
+  }
+
+  const candidates = new Set<string>();
+
+  if (preferred.includes("@")) {
+    const normalized = normalizeEmail(preferred);
+    if (normalized) candidates.add(normalized);
+    return Array.from(candidates);
+  }
+
+  const normalizedPhone = normalizePhone(preferred);
+  if (normalizedPhone) {
+    candidates.add(normalizedPhone);
+  }
+
+  const rawDigits = preferred.replace(/\D/g, "");
+  if (rawDigits.length === 10) {
+    candidates.add(rawDigits);
+    candidates.add(`91${rawDigits}`);
+    candidates.add(`+91${rawDigits}`);
+  }
+
+  if (preferred.startsWith("+91") && preferred.replace(/\D/g, "").length === 12) {
+    candidates.add(preferred.replace(/\D/g, ""));
+  }
+
+  const cleaned = preferred.replace(/\s+/g, "").replace(/\+91/, "");
+  if (/^\d{10}$/.test(cleaned)) {
+    candidates.add(cleaned);
+    candidates.add(`+91${cleaned}`);
+  }
+
+  return Array.from(candidates);
+}
+
+export function resolveLoginIdentifier(input: {
+  identifier?: unknown;
+  email?: unknown;
+  phone?: unknown;
+}) {
+  const candidates = getLoginLookupCandidates(input);
+
+  if (!candidates.length) {
+    return { email: "", phone: "" };
+  }
+
+  const emailCandidate = candidates.find((value) => value.includes("@"));
+  const phoneCandidate = candidates.find((value) => !value.includes("@"));
+
+  return {
+    email: emailCandidate ? normalizeEmail(emailCandidate) : "",
+    phone: phoneCandidate ? normalizePhone(phoneCandidate) || phoneCandidate : "",
+  };
+}
+
 export function hashPassword(password: string) {
   const salt = randomBytes(16).toString("hex");
   const hash = pbkdf2Sync(
@@ -42,7 +112,25 @@ export function hashPassword(password: string) {
   return `${passwordIterations}:${salt}:${hash}`;
 }
 
+export function hasCompatiblePasswordHash(storedHash: string) {
+  const [iterations, salt, hash] = storedHash.split(":");
+  const iterationCount = Number(iterations);
+
+  return Boolean(
+    Number.isInteger(iterationCount) &&
+      iterationCount > 0 &&
+      salt &&
+      /^[a-f0-9]+$/i.test(salt) &&
+      hash &&
+      /^[a-f0-9]+$/i.test(hash),
+  );
+}
+
 export function verifyPassword(password: string, storedHash: string) {
+  if (!hasCompatiblePasswordHash(storedHash)) {
+    return false;
+  }
+
   const [iterations, salt, hash] = storedHash.split(":");
 
   if (!iterations || !salt || !hash) {
@@ -72,7 +160,7 @@ export function getAuthSecret() {
     throw new Error("AUTH_SECRET must be configured in production.");
   }
 
-  return "woodloom-local-development-secret";
+  return "shissoo-local-development-secret";
 }
 
 function base64UrlEncode(value: string) {
@@ -108,7 +196,7 @@ export function verifySignedToken<T extends object>(token?: string) {
   }
 }
 
-export const sessionCookieName = "woodloom_session";
+export const sessionCookieName = "shissoo_session";
 
 export type SessionPayload = AuthUser & {
   expiresAt: number;

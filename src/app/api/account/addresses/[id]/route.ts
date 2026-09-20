@@ -28,11 +28,22 @@ export async function DELETE(_request: Request, { params }: AddressRouteProps) {
 
   const { id } = await params;
 
-  await prisma.address.deleteMany({
-    where: {
-      id,
-      userId: session.id,
-    },
+  await prisma.$transaction(async (transaction) => {
+    const address = await transaction.address.findFirst({
+      where: { id, userId: session.id },
+      select: { id: true },
+    });
+
+    if (!address) {
+      return;
+    }
+
+    await transaction.order.updateMany({
+      where: { shippingAddressId: address.id, userId: session.id },
+      data: { shippingAddressId: null },
+    });
+
+    await transaction.address.delete({ where: { id: address.id } });
   });
 
   return NextResponse.json({ ok: true });

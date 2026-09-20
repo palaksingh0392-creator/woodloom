@@ -21,7 +21,7 @@ export default function EditorsPicks({ products }: { products: Product[] }) {
     <section className="pb-24 overflow-hidden">
       <div className="max-w-[1600px] mx-auto px-6 lg:px-10">
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-[14px] tracking-[3px] uppercase font-medium text-[var(--text-primary)]">
+          <h2 className="text-[14px] tracking-[3px] uppercase text-[var(--text-primary)]">
             Editor&apos;s Picks
           </h2>
 

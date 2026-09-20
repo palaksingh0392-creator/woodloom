@@ -5,8 +5,8 @@ import { listAccountAddresses } from "@/lib/account";
 import { requireCustomerSession } from "@/lib/session";
 
 export const metadata = {
-  title: "Addresses | WOODLOOM",
-  description: "Manage your WOODLOOM delivery addresses.",
+  title: "Addresses | Shissoo",
+  description: "Manage your Shissoo delivery addresses.",
 };
 
 export default async function AccountAddressesPage() {

@@ -28,7 +28,7 @@ export default function WishlistPageContent({
           Wishlist
         </p>
 
-        <h1 className="text-4xl sm:text-5xl lg:text-7xl leading-[0.95] font-serif mb-8">
+        <h1 className="text-4xl sm:text-5xl lg:text-6xl leading-[1] font-serif mb-8">
           Save Pieces You Love
         </h1>
 
@@ -60,57 +60,48 @@ export default function WishlistPageContent({
           Wishlist
         </p>
 
-        <h1 className="text-4xl sm:text-5xl lg:text-7xl leading-[0.95] font-serif">
+        <h1 className="text-4xl sm:text-5xl lg:text-6xl leading-[1] font-serif">
           Saved For Later
         </h1>
       </div>
 
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid max-w-[920px] gap-6">
         {wishlistProducts.map((product) => (
-          <article key={product.slug} className="group">
+          <article
+            key={product.slug}
+            className="grid gap-6 rounded-[28px] border border-[var(--border)] bg-[var(--surface)] p-5 sm:grid-cols-[150px_1fr]"
+          >
             <Link
               href={`/products/${product.slug}`}
-              className="
-                relative
-                block
-                aspect-[4/5]
-                overflow-hidden
-                rounded-[28px]
-                bg-[var(--surface-muted)]
-                mb-5
-              "
+              className="relative aspect-square overflow-hidden rounded-[22px] bg-[var(--surface-muted)]"
             >
               <Image
                 src={product.images[0]}
                 alt={product.title}
                 fill
-                sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                className="
-                  object-cover
-                  transition-transform
-                  duration-700
-                  group-hover:scale-105
-                "
+                sizes="150px"
+                className="object-cover"
               />
             </Link>
 
-            <p className="uppercase tracking-[2px] text-xs text-[var(--text-secondary)] mb-2">
-              {product.category}
-            </p>
+            <div className="flex flex-col justify-between gap-6">
+              <div>
+                <p className="mb-2 text-sm uppercase tracking-[2px] text-[var(--text-secondary)]">
+                  {product.finishes[0] ?? product.category}
+                </p>
 
-            <Link href={`/products/${product.slug}`}>
-              <h2 className="text-3xl font-serif mb-2">{product.title}</h2>
-            </Link>
+                <Link href={`/products/${product.slug}`}>
+                  <h2 className="mb-3 font-serif text-2xl sm:text-3xl">
+                    {product.title}
+                  </h2>
+                </Link>
 
-            <p className="text-[var(--text-secondary)] mb-4">
-              {product.material}
-            </p>
+                <p className="text-xl font-semibold">{product.price}</p>
+              </div>
 
-            <div className="flex flex-wrap items-center justify-between gap-4">
-              <p className="text-xl font-semibold">{product.price}</p>
-
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center justify-between gap-4">
                 <button
+                  type="button"
                   onClick={() =>
                     commerceActions.addToCart({
                       productSlug: product.slug,
@@ -121,35 +112,21 @@ export default function WishlistPageContent({
                     })
                   }
                   className="
-                    flex
-                    h-11
-                    w-11
-                    items-center
-                    justify-center
-                    rounded-full
-                    bg-[var(--primary)]
-                    text-white
+                    inline-flex h-11 items-center gap-2 rounded-full bg-[var(--primary)] px-5 text-sm uppercase tracking-[1px] text-white
                   "
-                  aria-label="Add to cart"
                 >
                   <ShoppingBag size={18} />
+                  Add to cart
                 </button>
 
                 <button
+                  type="button"
                   onClick={() => commerceActions.toggleWishlist(product.slug)}
-                  className="
-                    flex
-                    h-11
-                    w-11
-                    items-center
-                    justify-center
-                    rounded-full
-                    border
-                    border-[var(--border)]
-                  "
+                  className="inline-flex h-11 items-center gap-2 rounded-full border border-[var(--border)] px-4 text-sm uppercase tracking-[1px]"
                   aria-label="Remove from wishlist"
                 >
                   <Heart size={18} className="fill-current" />
+                  Remove
                 </button>
               </div>
             </div>

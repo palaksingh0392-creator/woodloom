@@ -65,23 +65,25 @@ export default function FurnitureProductGrid({
           border
           border-[var(--border)]
           bg-[var(--surface)]
-          p-5
+          p-4
+          sm:p-5
           lg:sticky
           lg:top-32
           lg:self-start
         "
       >
-        <div className="mb-5 flex items-center gap-3">
+        <div className="mb-4 flex items-center gap-3 sm:mb-5">
           <SlidersHorizontal size={18} />
           <h2 className="text-xl">Filters</h2>
         </div>
 
-        <div className="flex flex-wrap gap-3 lg:flex-col">
-          {["All", ...filters].map((filter) => (
+        <div className="flex gap-3 overflow-x-auto pb-1 lg:flex-col lg:overflow-visible lg:pb-0">
+          {['All', ...filters].map((filter) => (
             <button
               key={filter}
               onClick={() => setActiveFilter(filter)}
               className={`
+                shrink-0
                 rounded-full
                 border
                 px-4

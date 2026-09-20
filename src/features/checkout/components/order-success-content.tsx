@@ -83,14 +83,31 @@ export default function OrderSuccessContent() {
 
         <div className="flex items-center justify-between">
           <span className="text-[var(--text-secondary)]">Payment method</span>
-          <strong>
-            {lastOrder.paymentMethod === "cod" ? "Cash On Delivery" : "Razorpay"}
-          </strong>
+          <strong>Razorpay / UPI</strong>
         </div>
 
         <div className="flex items-center justify-between">
           <span className="text-[var(--text-secondary)]">Items</span>
-          <strong>{lastOrder.items.length}</strong>
+          <strong className="max-w-[65%] text-right">
+            {lastOrder.items.map((item) => `${item.title} x ${item.quantity}`).join(", ")}
+          </strong>
+        </div>
+
+        <div className="flex items-center justify-between">
+          <span className="text-[var(--text-secondary)]">Payment plan</span>
+          <strong>
+            {lastOrder.paymentPlan === "partial" ? "30% advance" : "Full payment"}
+          </strong>
+        </div>
+
+        <div className="flex items-center justify-between">
+          <span className="text-[var(--text-secondary)]">Paid now</span>
+          <strong>{formatPrice(lastOrder.paidAmount ?? 0)}</strong>
+        </div>
+
+        <div className="flex items-center justify-between">
+          <span className="text-[var(--text-secondary)]">Balance due</span>
+          <strong>{formatPrice(lastOrder.dueAmount ?? 0)}</strong>
         </div>
 
         <div className="flex items-center justify-between border-t border-[var(--border)] pt-5 text-xl">

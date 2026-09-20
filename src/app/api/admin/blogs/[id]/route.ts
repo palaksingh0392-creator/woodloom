@@ -35,12 +35,19 @@ export async function PATCH(request: Request, context: RouteContext) {
   }
 }
 
-export async function DELETE(_request: Request, context: RouteContext) {
+export async function DELETE(request: Request, context: RouteContext) {
   if (!(await authorize())) {
     return NextResponse.json({ message: "Admin access required." }, { status: 401 });
   }
 
   const { id } = await context.params;
+  const hardDelete = new URL(request.url).searchParams.get("hard") === "true";
+
+  if (hardDelete) {
+    await prisma.blogPost.delete({ where: { id } });
+    return NextResponse.json({ ok: true });
+  }
+
   const post = await prisma.blogPost.update({
     where: { id },
     data: { isPublished: false, publishedAt: null },

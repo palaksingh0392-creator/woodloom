@@ -70,14 +70,51 @@ SMTP_PASS
 SMTP_FROM
 ```
 
-Razorpay is still disabled in the UI. Add these only when enabling online
-payments:
+### Gmail verification email
+
+Use a Google app password for `SMTP_PASS`; do not use your regular Gmail
+password. First enable 2-Step Verification on the Google account, then create
+an app password in the Google Account security settings. Keep the generated
+password private and do not commit it.
+
+For local development, add these values to `.env.local`:
+
+```text
+EMAIL_DELIVERY_MODE=smtp
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=your-gmail-address@gmail.com
+SMTP_PASS=your-16-character-google-app-password
+SMTP_FROM=your-gmail-address@gmail.com
+```
+
+Restart the Next.js server after changing `.env.local`, then run
+`npm run env:check`. The signup, login OTP, and password-reset verification
+emails will use this Gmail account.
+
+Razorpay is available when these keys are configured:
 
 ```text
 RAZORPAY_KEY_ID
 RAZORPAY_KEY_SECRET
 NEXT_PUBLIC_RAZORPAY_KEY_ID
 ```
+
+Until Razorpay is configured, selecting Razorpay at checkout opens the
+temporary UPI payment page. Set these public variables to the store's real
+payment details:
+
+```text
+NEXT_PUBLIC_TEMP_PAYMENT_UPI_ID
+NEXT_PUBLIC_TEMP_PAYMENT_PHONE
+NEXT_PUBLIC_TEMP_PAYMENT_EMAIL
+NEXT_PUBLIC_TEMP_PAYMENT_BACKUP_EMAIL
+NEXT_PUBLIC_TEMP_PAYMENT_QR_IMAGE
+```
+
+`NEXT_PUBLIC_TEMP_PAYMENT_QR_IMAGE` is optional. When omitted, the page
+generates a QR image from `NEXT_PUBLIC_TEMP_PAYMENT_UPI_ID`.
 
 Important: Vercel cannot use a local SQL Server URL such as
 `localhost:1433`. Production needs a hosted database endpoint that Vercel can
@@ -118,3 +155,19 @@ npm run build
 npm run env:check
 npx --yes vercel@latest deploy --prod --yes
 ```
+
+### IIS/Plesk deployment
+
+For the IIS/Plesk deployment configured by `web.config`, build on the server
+after uploading the source and before restarting the Node application:
+
+```powershell
+cd C:\Inetpub\vhosts\shissoo.com\httpdocs
+npm install
+npm run build
+```
+
+The `.next` directory must be uploaded or generated in that same `httpdocs`
+directory. In particular, `.next\prerender-manifest.json` must exist before
+IIS/iisnode starts `app.js`; do not copy only `.next\static` or the source
+files. Restart the domain's Node.js application after the build completes.

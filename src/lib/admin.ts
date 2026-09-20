@@ -48,6 +48,7 @@ function mapOrderStatus(status: string): AdminOrder["status"] {
 
 function mapPayment(method: string | undefined, status: string): AdminOrder["payment"] {
   if (method === "COD") return "COD";
+  if (status === "PARTIALLY_PAID" || status === "MANUAL_PENDING") return "Partial";
   if (status === "PAID") return "Paid";
   return "Pending";
 }
@@ -80,6 +81,7 @@ export async function getAdminOrders(): Promise<AdminOrder[]> {
           : order.items[0]?.productName ?? "Furniture order",
       items: order.items.map((item) => ({
         productName: item.productName,
+        productCode: item.productCode,
         sku: item.sku,
         quantity: item.quantity,
         total: formatPrice(Number(item.total)),
@@ -96,9 +98,13 @@ export async function getAdminOrders(): Promise<AdminOrder[]> {
             .join(", ")
         : "No shipping address",
       total: formatPrice(Number(order.total)),
+      paidAmount: formatPrice(Number(order.paidAmount)),
+      dueAmount: formatPrice(Number(order.dueAmount)),
+      paymentPlan: order.paymentPlan,
       payment: mapPayment(order.payment?.method, order.paymentStatus),
       paymentMethod: order.payment?.method ?? "Not recorded",
       paymentStatus: order.paymentStatus,
+      refundTransactionId: order.payment?.providerRefundId ?? null,
       returnRequest: order.returnRequest
         ? {
             status: order.returnRequest.status,

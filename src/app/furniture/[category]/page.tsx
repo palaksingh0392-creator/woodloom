@@ -3,52 +3,50 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import MainLayout from "@/components/layout/main-layout";
-import { getCategoryBySlug } from "@/data/categories";
 import FurnitureProductGrid from "@/features/furniture/components/furniture-product-grid";
 import {
-  listCatalogCategories,
+  getStorefrontCategoryBySlug,
   listCatalogProductsByCategorySlug,
+  listCatalogProductsBySubcategorySlug,
 } from "@/lib/catalog";
 
 type CategoryPageProps = {
   params: Promise<{
     category: string;
   }>;
+  searchParams: Promise<{ subcategory?: string }>;
 };
 
-export function generateStaticParams() {
-  const categories = listCatalogCategories();
-
-  return categories.map((category) => ({
-    category: category.slug,
-  }));
-}
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: CategoryPageProps) {
   const { category: slug } = await params;
-  const category = getCategoryBySlug(slug);
+  const category = await getStorefrontCategoryBySlug(slug);
 
   if (!category) {
     return {
-      title: "Category Not Found | WOODLOOM",
+      title: "Category Not Found | Shissoo",
     };
   }
 
   return {
-    title: `${category.title} | WOODLOOM`,
+    title: `${category.title} | Shissoo`,
     description: category.seoDescription,
   };
 }
 
-export default async function CategoryPage({ params }: CategoryPageProps) {
+export default async function CategoryPage({ params, searchParams }: CategoryPageProps) {
   const { category: slug } = await params;
-  const category = getCategoryBySlug(slug);
+  const { subcategory } = await searchParams;
+  const category = await getStorefrontCategoryBySlug(slug);
 
   if (!category) {
     notFound();
   }
 
-  const categoryProducts = await listCatalogProductsByCategorySlug(slug);
+  const categoryProducts = subcategory
+    ? await listCatalogProductsBySubcategorySlug(slug, subcategory)
+    : await listCatalogProductsByCategorySlug(slug);
 
   return (
     <MainLayout>

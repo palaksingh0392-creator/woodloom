@@ -52,10 +52,12 @@ const inspirations = [
 ];
 
 export const metadata = {
-  title: "Room Inspiration | WOODLOOM",
+  title: "Room Inspiration | Shissoo",
   description:
-    "Explore room styling ideas and curated furniture edits from WOODLOOM.",
+    "Explore room styling ideas and curated furniture edits from Shissoo.",
 };
+
+export const dynamic = "force-dynamic";
 
 export default function InspirationPage() {
   return (

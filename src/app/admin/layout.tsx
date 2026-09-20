@@ -1,12 +1,14 @@
 import AdminShell from "@/components/admin/admin-shell";
 import { requireAdminSession } from "@/lib/session";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  await requireAdminSession();
+  const admin = await requireAdminSession();
 
-  return <AdminShell>{children}</AdminShell>;
+  return <AdminShell admin={admin}>{children}</AdminShell>;
 }

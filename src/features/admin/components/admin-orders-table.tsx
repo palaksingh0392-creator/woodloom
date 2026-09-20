@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
@@ -19,6 +19,12 @@ const statusLabels: Record<string, string> = {
   CANCELLED: "Cancelled",
   RETURN_REQUESTED: "Return requested",
   RETURNED: "Returned",
+  MANUAL_PENDING: "Manual payment review",
+  AUTHORIZED: "Authorized",
+  PARTIALLY_PAID: "Partially paid",
+  PAID: "Paid",
+  FAILED: "Failed",
+  REFUNDED: "Refunded",
 };
 
 const controlClass =
@@ -27,18 +33,25 @@ const controlClass =
 export default function AdminOrdersTable({
   orders,
   editable = false,
+  highlightOrder,
 }: {
   orders: AdminOrder[];
   editable?: boolean;
+  highlightOrder?: string;
 }) {
   const router = useRouter();
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [message, setMessage] = useState("");
 
+  useEffect(() => {
+    if (!highlightOrder) return;
+    document.getElementById(`admin-order-${highlightOrder}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [highlightOrder]);
+
   async function updateOrder(
     order: AdminOrder,
-    patch: { status?: string; paymentStatus?: string },
+    patch: { status?: string; paymentStatus?: string; refundTransactionId?: string },
   ) {
     if (!order.databaseId) return;
     setUpdatingId(order.databaseId);
@@ -50,12 +63,13 @@ export default function AdminOrdersTable({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(patch),
       });
-      const result = (await response.json()) as { message?: string };
+      const result = (await response.json().catch(() => ({}))) as { message?: string };
 
       if (!response.ok) {
         throw new Error(result.message ?? "Could not update order.");
       }
 
+      router.replace("/admin/orders");
       router.refresh();
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Could not update order.");
@@ -89,7 +103,6 @@ export default function AdminOrdersTable({
             <tr className="border-b">
               <th className="py-3 pr-4 font-semibold">Order</th>
               <th className="px-4 py-3 font-semibold">Customer</th>
-              <th className="px-4 py-3 font-semibold">Placed</th>
               <th className="px-4 py-3 font-semibold">Payment</th>
               <th className="px-4 py-3 font-semibold">Status</th>
               <th className="py-3 pl-4 font-semibold text-right">Total</th>
@@ -106,10 +119,16 @@ export default function AdminOrdersTable({
                 <OrderRows
                   key={order.id}
                   order={order}
+                  highlighted={order.id === highlightOrder}
                   editable={editable}
                   isExpanded={isExpanded}
                   isUpdating={isUpdating}
-                  onToggle={() => setExpandedId(isExpanded ? null : order.id)}
+                  onToggle={() => {
+                    setExpandedId(isExpanded ? null : order.id);
+                    if (order.id === highlightOrder) {
+                      router.replace("/admin/orders");
+                    }
+                  }}
                   onUpdate={(patch) => updateOrder(order, patch)}
                 />
               );
@@ -123,6 +142,7 @@ export default function AdminOrdersTable({
 
 function OrderRows({
   order,
+  highlighted,
   editable,
   isExpanded,
   isUpdating,
@@ -130,16 +150,20 @@ function OrderRows({
   onUpdate,
 }: {
   order: AdminOrder;
+  highlighted: boolean;
   editable: boolean;
   isExpanded: boolean;
   isUpdating: boolean;
   onToggle: () => void;
-  onUpdate: (patch: { status?: string; paymentStatus?: string }) => void;
+  onUpdate: (patch: { status?: string; paymentStatus?: string; refundTransactionId?: string }) => void;
 }) {
   return (
     <>
-      <tr className="border-b">
+      <tr id={`admin-order-${order.id}`} className={`border-b transition-colors ${highlighted ? "bg-amber-100/70 outline outline-2 outline-inset outline-amber-400 dark:bg-amber-950/40" : ""}`}>
         <td className="py-4 pr-4">
+          <span className="block text-xs font-semibold uppercase tracking-wide text-[var(--text-secondary)]">
+            {order.date}
+          </span>
           <strong className="block">{order.id}</strong>
           <span className="text-xs text-[var(--text-secondary)]">{order.item}</span>
         </td>
@@ -149,14 +173,22 @@ function OrderRows({
             <span className="text-xs text-[var(--text-secondary)]">{order.email}</span>
           ) : null}
         </td>
-        <td className="px-4 py-4 text-[var(--text-secondary)]">{order.date}</td>
         <td className="px-4 py-4">
           {editable && order.databaseId ? (
             <select
               aria-label={`Payment status for ${order.id}`}
               value={order.paymentStatus ?? "PENDING"}
               disabled={isUpdating}
-              onChange={(event) => onUpdate({ paymentStatus: event.target.value })}
+              onChange={(event) => {
+                const paymentStatus = event.target.value;
+                if (paymentStatus === "REFUNDED") {
+                  const refundTransactionId = window.prompt("Refund transaction ID", order.refundTransactionId ?? "")?.trim();
+                  if (!refundTransactionId) return;
+                  onUpdate({ paymentStatus, refundTransactionId });
+                  return;
+                }
+                onUpdate({ paymentStatus });
+              }}
               className={controlClass}
             >
               {paymentStatuses.map((status) => (
@@ -204,14 +236,20 @@ function OrderRows({
       </tr>
 
       {editable && isExpanded ? (
-        <tr className="border-b bg-[var(--surface-soft)]">
-          <td colSpan={7} className="p-4">
+        <tr className={`border-b bg-[var(--surface-soft)] ${highlighted ? "outline outline-2 outline-inset outline-amber-400" : ""}`}>
+          <td colSpan={editable ? 6 : 5} className="p-4">
             <div className="grid gap-5 lg:grid-cols-[0.8fr_1.2fr]">
               <div className="space-y-3">
                 <Detail label="Customer" value={order.customer} />
                 <Detail label="Email" value={order.email ?? "Not provided"} />
                 <Detail label="Phone" value={order.phone ?? "Not provided"} />
                 <Detail label="Payment method" value={order.paymentMethod ?? "Not recorded"} />
+                <Detail
+                  label="Payment plan"
+                  value={order.paymentPlan === "PARTIAL" ? "30% advance" : "Full payment"}
+                />
+                <Detail label="Paid amount" value={order.paidAmount ?? "Not recorded"} />
+                <Detail label="Balance due" value={order.dueAmount ?? "Not recorded"} />
                 <Detail label="Shipping address" value={order.address ?? "Not provided"} />
                 {order.returnRequest ? (
                   <div className="rounded-md border border-[var(--border)] bg-[var(--surface)] p-3">
@@ -241,7 +279,7 @@ function OrderRows({
                       <div>
                         <strong className="block">{item.productName}</strong>
                         <span className="text-xs text-[var(--text-secondary)]">
-                          {item.sku} · Qty {item.quantity}
+                          Code {item.productCode || "Not recorded"} · Variant code {item.sku} · Qty {item.quantity}
                         </span>
                       </div>
                       <strong>{item.total}</strong>

@@ -3,8 +3,8 @@ import PolicySection from "@/components/shared/policy-section";
 import StaticPage from "@/components/shared/static-page";
 
 export const metadata = {
-  title: "Terms & Conditions | WOODLOOM",
-  description: "WOODLOOM website and purchase terms.",
+  title: "Terms & Conditions | Shissoo",
+  description: "Shissoo website and purchase terms.",
 };
 
 export default function TermsAndConditionsPage() {
@@ -12,7 +12,7 @@ export default function TermsAndConditionsPage() {
     <MainLayout>
       <StaticPage
         eyebrow="Terms & Conditions"
-        title="Terms For Using WOODLOOM"
+        title="Terms For Using Shissoo"
         description="These terms prepare the public legal layer for browsing, checkout, payments, returns, and account usage."
       >
         <PolicySection title="Website Use">

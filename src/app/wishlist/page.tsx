@@ -3,9 +3,11 @@ import WishlistPageContent from "@/features/wishlist/components/wishlist-page-co
 import { listCatalogProducts } from "@/lib/catalog";
 
 export const metadata = {
-  title: "Wishlist | WOODLOOM",
-  description: "Your saved WOODLOOM furniture pieces.",
+  title: "Wishlist | Shissoo",
+  description: "Your saved Shissoo furniture pieces.",
 };
+
+export const dynamic = "force-dynamic";
 
 export default async function WishlistPage() {
   const products = await listCatalogProducts();

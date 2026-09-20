@@ -5,17 +5,21 @@ import { prisma } from "@/lib/prisma";
 export type ProductVariantInput = {
   id?: string;
   finish: string;
+  grade?: string;
   color?: string;
   sku: string;
   stock: number;
   reorderAt: number;
+  priceAdjustment: number;
 };
 
 export type AdminProductInput = {
   name: string;
   slug: string;
+  productCode: string;
   sku: string;
   categoryId: string;
+  subcategoryId?: string;
   collectionId?: string;
   shortDescription: string;
   description: string;
@@ -31,6 +35,22 @@ export type AdminProductInput = {
   imageUrls: string[];
   variants: ProductVariantInput[];
 };
+
+export function getReadableAdminProductError(message: string) {
+  if (/transaction has not begun|transaction.*expired|timed out/i.test(message)) {
+    return "The database took too long to save this product. Please try again.";
+  }
+
+  if (/foreign key|categoryId|subcategoryId|collectionId/i.test(message)) {
+    return "One of the selected categories or collections is no longer available. Refresh the page and try again.";
+  }
+
+  if (/connection|connect|database|prisma|invocation/i.test(message)) {
+    return "The product could not be saved because the database is temporarily unavailable. Please try again.";
+  }
+
+  return message;
+}
 
 export function slugifyProductName(value: string) {
   return value
@@ -52,6 +72,7 @@ export function parseAdminProductInput(body: unknown): AdminProductInput {
 
   const input = body as Record<string, unknown>;
   const name = optionalText(input.name);
+  const productCode = optionalText(input.productCode)?.toUpperCase();
   const sku = optionalText(input.sku)?.toUpperCase();
   const categoryId = optionalText(input.categoryId);
   const shortDescription = optionalText(input.shortDescription);
@@ -63,8 +84,8 @@ export function parseAdminProductInput(body: unknown): AdminProductInput {
       : Number(input.compareAtPrice);
   const status = input.status;
 
-  if (!name || !sku || !categoryId || !shortDescription || !description) {
-    throw new Error("Name, SKU, category, and descriptions are required.");
+  if (!name || !productCode || !sku || !categoryId || !shortDescription || !description) {
+    throw new Error("Name, product code, category, and descriptions are required.");
   }
 
   if (!Number.isFinite(price) || price < 0) {
@@ -111,19 +132,23 @@ export function parseAdminProductInput(body: unknown): AdminProductInput {
     ? input.variants.map((variant, index) => {
         const item = variant as Record<string, unknown>;
         const finish = optionalText(item.finish);
+        const grade = optionalText(item.grade);
         const variantSku = optionalText(item.sku)?.toUpperCase();
         const stock = Number(item.stock);
         const reorderAt = Number(item.reorderAt);
+        const priceAdjustment = Number(item.priceAdjustment ?? 0);
 
         if (!finish || !variantSku) {
-          throw new Error(`Finish and SKU are required for variant ${index + 1}.`);
+          throw new Error(`Finish and product code are required for variant ${index + 1}.`);
         }
 
         if (
           !Number.isInteger(stock) ||
           stock < 0 ||
           !Number.isInteger(reorderAt) ||
-          reorderAt < 0
+          reorderAt < 0 ||
+          !Number.isFinite(priceAdjustment) ||
+          priceAdjustment < 0
         ) {
           throw new Error(`Enter valid stock values for variant ${index + 1}.`);
         }
@@ -131,10 +156,12 @@ export function parseAdminProductInput(body: unknown): AdminProductInput {
         return {
           id: optionalText(item.id),
           finish,
+          grade,
           color: optionalText(item.color),
           sku: variantSku,
           stock,
           reorderAt,
+          priceAdjustment,
         };
       })
     : [];
@@ -146,8 +173,10 @@ export function parseAdminProductInput(body: unknown): AdminProductInput {
   return {
     name,
     slug: slugifyProductName(optionalText(input.slug) ?? name),
+    productCode,
     sku,
     categoryId,
+    subcategoryId: optionalText(input.subcategoryId),
     collectionId: optionalText(input.collectionId),
     shortDescription,
     description,
@@ -167,6 +196,7 @@ export function parseAdminProductInput(body: unknown): AdminProductInput {
 
 const adminProductInclude = {
   category: true,
+  subcategory: true,
   collection: true,
   images: { orderBy: { sortOrder: "asc" as const } },
   variants: { orderBy: { createdAt: "asc" as const } },
@@ -198,16 +228,31 @@ export async function getProductFormOptions() {
     }),
   ]);
 
-  return { categories, collections };
+  let subcategories: Awaited<ReturnType<typeof prisma.subcategory.findMany>> = [];
+
+  try {
+    if (prisma.subcategory) {
+      subcategories = await prisma.subcategory.findMany({
+        where: { isActive: true },
+        orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+      });
+    }
+  } catch (error) {
+    console.warn("Subcategory options unavailable until the database is updated:", error);
+  }
+
+  return { categories, subcategories, collections };
 }
 
 export async function createAdminProduct(input: AdminProductInput) {
   return prisma.product.create({
     data: {
       categoryId: input.categoryId,
+      subcategoryId: input.subcategoryId,
       collectionId: input.collectionId,
       name: input.name,
       slug: input.slug,
+      productCode: input.productCode,
       sku: input.sku,
       shortDescription: input.shortDescription,
       description: input.description,
@@ -230,10 +275,12 @@ export async function createAdminProduct(input: AdminProductInput) {
       variants: {
         create: input.variants.map((variant) => ({
           finish: variant.finish,
+          grade: variant.grade,
           color: variant.color,
           sku: variant.sku,
           stock: variant.stock,
           reorderAt: variant.reorderAt,
+          priceAdjustment: variant.priceAdjustment,
         })),
       },
     },
@@ -260,10 +307,12 @@ export async function updateAdminProduct(
     for (const variant of input.variants) {
       const data = {
         finish: variant.finish,
+        grade: variant.grade,
         color: variant.color,
         sku: variant.sku,
         stock: variant.stock,
         reorderAt: variant.reorderAt,
+        priceAdjustment: variant.priceAdjustment,
       };
 
       if (variant.id && existing.variants.some((item) => item.id === variant.id)) {
@@ -282,9 +331,11 @@ export async function updateAdminProduct(
       where: { id },
       data: {
         categoryId: input.categoryId,
+        subcategoryId: input.subcategoryId ?? null,
         collectionId: input.collectionId ?? null,
         name: input.name,
         slug: input.slug,
+        productCode: input.productCode,
         sku: input.sku,
         shortDescription: input.shortDescription,
         description: input.description,
@@ -307,5 +358,8 @@ export async function updateAdminProduct(
       },
       include: adminProductInclude,
     });
+  }, {
+    maxWait: 10000,
+    timeout: 30000,
   });
 }

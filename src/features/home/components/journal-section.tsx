@@ -193,7 +193,7 @@ export default function JournalSection() {
               <item.icon className="w-6 h-6 text-[var(--text-primary)]" />
 
               <div>
-                <h4 className="text-sm font-medium text-[var(--text-primary)]">
+                <h4 className="text-sm text-[var(--text-primary)]">
                   {item.title}
                 </h4>
 

@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 
 import type { AccountProfile } from "@/lib/account";
+import { formatPhoneInput } from "@/lib/account-validation";
 import AuthField from "@/features/auth/components/auth-field";
 
 export default function ProfileForm({
@@ -60,8 +61,12 @@ export default function ProfileForm({
         name="phone"
         label="Phone number"
         type="tel"
+        maxLength={16}
         defaultValue={profile.phone}
         placeholder="+91 98765 43210"
+        onChange={(event) => {
+          event.currentTarget.value = formatPhoneInput(event.currentTarget.value);
+        }}
       />
       <AuthField
         id="role"

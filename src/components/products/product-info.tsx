@@ -7,6 +7,7 @@ import {
   ChevronDown,
   Heart,
   Minus,
+  PackageCheck,
   Plus,
   RotateCcw,
   ShieldCheck,
@@ -18,6 +19,8 @@ import {
   commerceActions,
   useIsWishlisted,
 } from "@/store/commerce-store";
+import { canReserveVariant } from "@/lib/stock";
+import { parsePriceAmount } from "@/lib/price";
 
 type ProductInfoProps = {
   product: Product;
@@ -27,8 +30,36 @@ export default function ProductInfo({ product }: ProductInfoProps) {
   const router = useRouter();
   const [quantity, setQuantity] = useState(1);
   const [selectedFinish, setSelectedFinish] = useState(product.finishes[0]);
+  const visibleGrades = product.grades?.filter(Boolean) ?? [];
+  const [selectedGrade, setSelectedGrade] = useState("");
   const [openSection, setOpenSection] = useState("details");
   const isWishlisted = useIsWishlisted(product.slug);
+  const selectedFinishStock = product.inventoryByFinish?.[selectedFinish] ?? null;
+  const selectedVariantKey = `${selectedFinish.trim().toLowerCase()}::${selectedGrade.trim().toLowerCase()}`;
+  const selectedGradeAdjustment =
+    product.variantPriceAdjustments?.[selectedVariantKey] ??
+    (selectedGrade ? product.gradePriceAdjustments?.[selectedGrade] ?? 0 : 0);
+  const selectedPrice = parsePriceAmount(product.price) + selectedGradeAdjustment;
+  const displayPrice = `Rs. ${selectedPrice.toLocaleString("en-IN")}`;
+  const stockLimit = selectedFinishStock ?? Number.MAX_SAFE_INTEGER;
+  const isSoldOut = selectedFinishStock !== null && selectedFinishStock <= 0;
+  const stockLabel =
+    selectedFinishStock === null
+      ? "Ready to ship"
+      : selectedFinishStock <= 0
+        ? "Out of stock"
+        : selectedFinishStock <= 5
+          ? `Only ${selectedFinishStock} left`
+          : `${selectedFinishStock} in stock`;
+
+  const handleQuantityChange = (nextQuantity: number) => {
+    if (selectedFinishStock !== null) {
+      setQuantity(Math.min(Math.max(1, nextQuantity), selectedFinishStock));
+      return;
+    }
+
+    setQuantity(Math.max(1, nextQuantity));
+  };
 
   const sections = [
     {
@@ -54,7 +85,7 @@ export default function ProductInfo({ product }: ProductInfoProps) {
         className="
           uppercase
           tracking-[3px]
-          text-sm
+          text-xs
           text-[var(--primary)]
           mb-4
         "
@@ -62,12 +93,23 @@ export default function ProductInfo({ product }: ProductInfoProps) {
         {product.collection}
       </p>
 
+      <span
+        className={`mb-4 inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold ${
+          isSoldOut
+            ? "border-red-200 bg-red-50 text-red-700"
+            : "border-emerald-200 bg-emerald-50 text-emerald-700"
+        }`}
+      >
+        <PackageCheck size={15} />
+        {stockLabel}
+      </span>
+
       <h1
         className="
           text-4xl
-          sm:text-5xl
-          lg:text-6xl
-          leading-[1.05]
+          sm:text-[2.75rem]
+          lg:text-5xl
+          leading-[1.08]
           font-serif
           max-w-[620px]
           mb-6
@@ -86,11 +128,12 @@ export default function ProductInfo({ product }: ProductInfoProps) {
       >
         <p
           className="
-            text-3xl
+            text-2xl
+            sm:text-3xl
             font-semibold
           "
         >
-          {product.price}
+          {displayPrice}
         </p>
 
         {product.compareAtPrice && (
@@ -108,8 +151,8 @@ export default function ProductInfo({ product }: ProductInfoProps) {
 
       <p
         className="
-          text-[17px]
-          leading-relaxed
+          text-base
+          leading-7
           text-[var(--text-secondary)]
           max-w-[620px]
           mb-10
@@ -119,16 +162,17 @@ export default function ProductInfo({ product }: ProductInfoProps) {
       </p>
 
       <div className="mb-10">
-        <p
-          className="
-            text-sm
-            uppercase
-            tracking-[2px]
-            mb-4
-          "
-        >
-          Finish
-        </p>
+        <div className="mb-4">
+          <p
+            className="
+              text-xs
+              uppercase
+              tracking-[2px]
+            "
+          >
+            Finish
+          </p>
+        </div>
 
         <div className="flex flex-wrap gap-3 sm:gap-4">
           {product.finishes.map((finish) => (
@@ -154,6 +198,27 @@ export default function ProductInfo({ product }: ProductInfoProps) {
             </button>
           ))}
         </div>
+
+        {visibleGrades.length > 0 ? (
+          <div className="mt-7">
+            <div className="flex flex-wrap gap-3 sm:gap-4">
+              {visibleGrades.map((grade) => (
+                <button
+                  key={grade}
+                  type="button"
+                  onClick={() => setSelectedGrade(grade)}
+                  className={`rounded-full border px-4 py-3 transition-all sm:px-5 ${
+                    selectedGrade === grade
+                      ? "border-[var(--primary)] bg-[var(--primary)] text-white"
+                      : "border-[var(--border)] hover:border-[var(--primary)]"
+                  }`}
+                >
+                  {grade}
+                </button>
+              ))}
+            </div>
+          </div>
+        ) : null}
       </div>
 
       <div
@@ -179,7 +244,7 @@ export default function ProductInfo({ product }: ProductInfoProps) {
           "
         >
           <button
-            onClick={() => setQuantity((prev) => (prev > 1 ? prev - 1 : 1))}
+            onClick={() => handleQuantityChange(quantity - 1)}
             className="
               w-12
               h-12
@@ -191,17 +256,24 @@ export default function ProductInfo({ product }: ProductInfoProps) {
             <Minus size={18} />
           </button>
 
-          <span
-            className="
-              w-12
-              text-center
-            "
-          >
-            {quantity}
-          </span>
+          <input
+            type="number"
+            min={1}
+            max={selectedFinishStock ?? undefined}
+            value={quantity}
+            onChange={(event) => handleQuantityChange(Number(event.target.value))}
+            aria-label="Quantity"
+            className="w-14 bg-transparent text-center outline-none"
+          />
 
           <button
-            onClick={() => setQuantity((prev) => prev + 1)}
+            onClick={() => {
+              const nextQuantity = quantity + 1;
+              if (!canReserveVariant(stockLimit, 0, nextQuantity)) {
+                return;
+              }
+              handleQuantityChange(nextQuantity);
+            }}
             className="
               w-12
               h-12
@@ -216,16 +288,22 @@ export default function ProductInfo({ product }: ProductInfoProps) {
 
         <button
           onClick={() => {
+            if (!canReserveVariant(stockLimit, 0, quantity)) {
+              return;
+            }
+
             commerceActions.addToCart({
               productSlug: product.slug,
               title: product.title,
               price: product.price,
               image: product.images[0],
               finish: selectedFinish,
+              grade: selectedGrade || undefined,
               quantity,
             });
             router.push("/cart");
           }}
+          disabled={isSoldOut}
           className="
             h-14
             px-8
@@ -240,9 +318,11 @@ export default function ProductInfo({ product }: ProductInfoProps) {
             transition-all
             flex-1
             sm:flex-none
+            disabled:cursor-not-allowed
+            disabled:opacity-50
           "
         >
-          Add To Cart
+          {isSoldOut ? "Sold Out" : "Add To Cart"}
         </button>
 
         <button

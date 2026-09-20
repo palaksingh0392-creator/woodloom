@@ -28,12 +28,15 @@ export default function ThemeToggle() {
         setTheme(isDark ? "light" : "dark");
       }}
       aria-label={label}
+      data-hover-label={label}
       className="
         card-surface
         p-2.5
         sm:p-3
         transition-default
         hover:scale-105
+        hover:bg-[var(--surface-muted)]
+        hover:text-[var(--primary)]
       "
     >
       {!mounted ? (

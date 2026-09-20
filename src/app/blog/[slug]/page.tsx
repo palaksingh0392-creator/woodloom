@@ -3,7 +3,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import MainLayout from "@/components/layout/main-layout";
-import { blogPosts } from "@/data/blogs";
 import {
   getPublishedBlogPostBySlug,
   listPublishedBlogPosts,
@@ -15,11 +14,7 @@ type BlogPostPageProps = {
   }>;
 };
 
-export function generateStaticParams() {
-  return blogPosts.map((post) => ({
-    slug: post.slug,
-  }));
-}
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: BlogPostPageProps) {
   const { slug } = await params;
@@ -27,12 +22,12 @@ export async function generateMetadata({ params }: BlogPostPageProps) {
 
   if (!post) {
     return {
-      title: "Article Not Found | WOODLOOM",
+      title: "Article Not Found | Shissoo",
     };
   }
 
   return {
-    title: `${post.title} | WOODLOOM Journal`,
+    title: `${post.title} | Shissoo Journal`,
     description: post.excerpt,
   };
 }

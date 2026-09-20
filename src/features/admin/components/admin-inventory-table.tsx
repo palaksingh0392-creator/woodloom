@@ -10,7 +10,7 @@ export default function AdminInventoryTable({
       <table className="w-full min-w-[680px] text-left text-sm">
         <thead className="text-xs uppercase tracking-[0.12em] text-[var(--text-secondary)]">
           <tr className="border-b">
-            <th className="py-3 pr-4 font-semibold">SKU</th>
+            <th className="py-3 pr-4 font-semibold">Product code</th>
             <th className="px-4 py-3 font-semibold">Product</th>
             <th className="px-4 py-3 font-semibold">Category</th>
             <th className="px-4 py-3 font-semibold">Reserved</th>

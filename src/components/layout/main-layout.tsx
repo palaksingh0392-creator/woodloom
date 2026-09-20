@@ -1,17 +1,23 @@
 import FooterSection from "./footer";
 import Navbar from "./navbar";
 import Topbar from "./topbar";
+import { listNavigationCategories, listNavigationLinks } from "@/lib/navigation";
 
-export default function MainLayout({
+export default async function MainLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const [navigationLinks, navigationCategories] = await Promise.all([
+    listNavigationLinks({ activeOnly: true }),
+    listNavigationCategories(),
+  ]);
+
   return (
     <>
       <Topbar />
 
-      <Navbar />
+      <Navbar links={navigationLinks} categories={navigationCategories} />
 
       <main>{children}</main>
 

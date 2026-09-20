@@ -5,8 +5,8 @@ import AccountShell from "@/features/account/components/account-shell";
 import { requireCustomerSession } from "@/lib/session";
 
 export const metadata = {
-  title: "Account | WOODLOOM",
-  description: "Manage your WOODLOOM customer account.",
+  title: "Account | Shissoo",
+  description: "Manage your Shissoo customer account.",
 };
 
 const stats = [

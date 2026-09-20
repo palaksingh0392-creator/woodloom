@@ -3,8 +3,8 @@ import AuthCard from "@/features/auth/components/auth-card";
 import LoginForm from "@/features/auth/components/login-form";
 
 export const metadata = {
-  title: "Login | WOODLOOM",
-  description: "Login to your WOODLOOM account.",
+  title: "Login | Shissoo",
+  description: "Login to your Shissoo account.",
 };
 
 type LoginPageProps = {
@@ -21,9 +21,9 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
     <MainLayout>
       <AuthCard
         eyebrow="Customer Login"
-        title="Welcome Back To WOODLOOM"
+        title="Welcome Back To Shissoo"
         description="Access your saved pieces, checkout details, and future order tracking from one calm account space."
-        footerText="New to WOODLOOM?"
+        footerText="New to Shissoo?"
         footerHref="/register"
         footerLabel="Create an account"
       >

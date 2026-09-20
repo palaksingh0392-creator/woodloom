@@ -1,54 +1,40 @@
 .heading-display {
   font-family: var(--font-heading);
-
-  font-size: clamp(4rem, 8vw, 7rem);
-
-  line-height: 0.95;
-
-  letter-spacing: 0;
-
+  font-size: clamp(3.25rem, 7vw, 6.5rem);
+  line-height: 0.98;
+  letter-spacing: -0.015em;
   font-weight: 600;
 }
 
 .heading-xl {
   font-family: var(--font-heading);
 
-  font-size: clamp(3rem, 6vw, 5rem);
-
-  line-height: 1;
-
-  letter-spacing: 0;
-
+  font-size: clamp(2.75rem, 5vw, 4.75rem);
+  line-height: 1.02;
+  letter-spacing: -0.012em;
   font-weight: 600;
 }
 
 .heading-lg {
   font-family: var(--font-heading);
 
-  font-size: clamp(2.2rem, 4vw, 3.5rem);
-
-  line-height: 1.05;
-
-  letter-spacing: 0;
-
+  font-size: clamp(2rem, 3.5vw, 3.25rem);
+  line-height: 1.08;
+  letter-spacing: -0.008em;
   font-weight: 600;
 }
 
 .heading-md {
   font-family: var(--font-heading);
 
-  font-size: 2rem;
-
-  line-height: 1.1;
-
+  font-size: 1.75rem;
+  line-height: 1.15;
   font-weight: 600;
 }
 
 .body-lg {
-  font-size: 1.2rem;
-
-  line-height: 1.9;
-
+  font-size: 1.125rem;
+  line-height: 1.7;
   color: var(--text-secondary);
 
   font-weight: 400;
@@ -56,16 +42,13 @@
 
 .body-md {
   font-size: 1rem;
-
-  line-height: 1.8;
-
+  line-height: 1.65;
   color: var(--text-secondary);
 }
 
 .label-text {
   font-size: 0.75rem;
-
-  letter-spacing: 0.3em;
+  letter-spacing: 0.2em;
 
   text-transform: uppercase;
 

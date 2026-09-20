@@ -4,8 +4,8 @@ import AccountWishlistContent from "@/features/account/components/account-wishli
 import { listCatalogProducts } from "@/lib/catalog";
 
 export const metadata = {
-  title: "Account Wishlist | WOODLOOM",
-  description: "Manage your saved WOODLOOM furniture pieces.",
+  title: "Account Wishlist | Shissoo",
+  description: "Manage your saved Shissoo furniture pieces.",
 };
 
 export default async function AccountWishlistPage() {

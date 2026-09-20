@@ -4,10 +4,7 @@ import MainLayout from "@/components/layout/main-layout";
 import ProductGallery from "@/components/products/product-gallery";
 import ProductInfo from "@/components/products/product-info";
 import ReviewsSection from "@/components/products/reviews-section";
-import {
-  getCatalogProductBySlug,
-  listCatalogProducts,
-} from "@/lib/catalog";
+import { getCatalogProductBySlug } from "@/lib/catalog";
 import { listProductReviews } from "@/lib/reviews";
 import { getCurrentSession } from "@/lib/session";
 
@@ -17,13 +14,7 @@ type ProductPageProps = {
   }>;
 };
 
-export async function generateStaticParams() {
-  const products = await listCatalogProducts();
-
-  return products.map((product) => ({
-    slug: product.slug,
-  }));
-}
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: ProductPageProps) {
   const { slug } = await params;
@@ -31,12 +22,12 @@ export async function generateMetadata({ params }: ProductPageProps) {
 
   if (!product) {
     return {
-      title: "Product Not Found | WOODLOOM",
+      title: "Product Not Found | Shissoo",
     };
   }
 
   return {
-    title: `${product.title} | WOODLOOM`,
+    title: `${product.title} | Shissoo`,
     description: product.shortDescription,
   };
 }

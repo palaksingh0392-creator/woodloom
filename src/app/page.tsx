@@ -11,26 +11,37 @@ import SeasonalOffer from "@/features/home/components/seasonal-offer";
 import RecommendedProducts from "@/features/home/components/recommended-products";
 import CustomerTestimonials from "@/features/home/components/customer-testimonials";
 import StoreLocator from "@/features/home/components/store-locator";
-import { listCatalogProducts } from "@/lib/catalog";
+import HomeAuthPopup from "@/features/auth/components/home-auth-popup";
+import { listCatalogCollectionCards, listCatalogProducts } from "@/lib/catalog";
+import { listHomeHeroSlides } from "@/lib/home";
+import { listStoreLocations } from "@/lib/store-locations";
 
 export default async function HomePage() {
-  const products = await listCatalogProducts();
+  const [products, collections, heroSlides, storeLocations] = await Promise.all([
+    listCatalogProducts(),
+    listCatalogCollectionCards(),
+    listHomeHeroSlides(),
+    listStoreLocations({ activeOnly: true }),
+  ]);
 
   return (
     <MainLayout>
-      <HeroSection />
+      <div className="home-page">
+        <HomeAuthPopup />
+        <HeroSection slides={heroSlides} />
 
-      <CuratedCollections />
+        <CuratedCollections collections={collections} />
 
-      <FeaturedProducts products={products} />
-      <SeasonalOffer />
-      <OurStory />
-      <RoomInspiration />
-      <EditorsPicks products={products} />
-      <RecommendedProducts products={products} />
-      <CustomerTestimonials />
-      <StoreLocator />
-      <JournalSection />
+        <FeaturedProducts products={products} />
+        <SeasonalOffer />
+        <RoomInspiration />
+        <OurStory />
+        <EditorsPicks products={products} />
+        <RecommendedProducts products={products} />
+        <CustomerTestimonials />
+        <StoreLocator locations={storeLocations} />
+        <JournalSection />
+      </div>
     </MainLayout>
   );
 }

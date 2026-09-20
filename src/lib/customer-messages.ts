@@ -1,6 +1,8 @@
 import "server-only";
 
 import { hasDatabaseUrl } from "@/lib/auth";
+import { createAdminNotification } from "@/lib/admin-notifications";
+import { normalizePhone } from "@/lib/account-validation";
 import { sendAuthEmail } from "@/lib/email";
 import { prisma } from "@/lib/prisma";
 
@@ -27,6 +29,9 @@ export async function createContactMessage(input: ContactMessageInput) {
 
   if (!name) throw new Error("Name is required.");
   if (!emailPattern.test(email)) throw new Error("Valid email is required.");
+  if (phone && !normalizePhone(phone)) {
+    throw new Error("Enter a valid phone number with exactly 10 digits after +91.");
+  }
   if (!subject) throw new Error("Subject is required.");
   if (message.length < 10) {
     throw new Error("Message should be at least 10 characters.");
@@ -34,22 +39,35 @@ export async function createContactMessage(input: ContactMessageInput) {
 
   if (!hasDatabaseUrl()) {
     await sendAuthEmail({
-      to: "hello@woodloom.in",
+      to: "hello@shissoo.com",
       subject: `Contact request: ${subject}`,
       text: `Name: ${name}\nEmail: ${email}\nPhone: ${phone || "-"}\n\n${message}`,
     });
     return null;
   }
 
-  return prisma.contactMessage.create({
+  const contactMessage = await prisma.contactMessage.create({
     data: {
       name,
       email,
-      phone: phone || null,
+      phone: phone ? normalizePhone(phone) : null,
       subject,
       message,
     },
   });
+
+  try {
+    await createAdminNotification({
+      type: "MESSAGE",
+      title: "New customer message",
+      message: `${contactMessage.name}: ${contactMessage.subject}`,
+      href: "/admin/messages",
+    });
+  } catch (error) {
+    console.warn("Could not create message notification:", error);
+  }
+
+  return contactMessage;
 }
 
 export async function subscribeToNewsletter(input: {
@@ -66,13 +84,16 @@ export async function subscribeToNewsletter(input: {
   if (!hasDatabaseUrl()) {
     await sendAuthEmail({
       to: email,
-      subject: "Welcome to WOODLOOM",
-      text: "You are subscribed to WOODLOOM updates.",
+      subject: "Welcome to Shissoo",
+      text: "You are subscribed to Shissoo updates.",
     });
     return null;
   }
 
-  return prisma.newsletterSubscriber.upsert({
+  const existingSubscriber = await prisma.newsletterSubscriber.findUnique({
+    where: { email },
+  });
+  const subscriber = await prisma.newsletterSubscriber.upsert({
     where: { email },
     create: {
       email,
@@ -84,6 +105,21 @@ export async function subscribeToNewsletter(input: {
       status: "ACTIVE",
     },
   });
+
+  if (!existingSubscriber) {
+    try {
+      await createAdminNotification({
+        type: "CUSTOMER",
+        title: "New newsletter subscriber",
+        message: `${subscriber.email} joined the newsletter.`,
+        href: "/admin/messages",
+      });
+    } catch (error) {
+      console.warn("Could not create subscriber notification:", error);
+    }
+  }
+
+  return subscriber;
 }
 
 export async function listAdminContactMessages() {

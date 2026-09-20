@@ -25,7 +25,7 @@ export default function NewsletterForm() {
     const data = (await response.json()) as { message?: string };
 
     setIsSubmitting(false);
-    setMessage(data.message ?? "You are subscribed to WOODLOOM updates.");
+    setMessage(data.message ?? "You are subscribed to Shissoo updates.");
 
     if (response.ok) {
       form.reset();

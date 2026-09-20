@@ -4,6 +4,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 
+import {
+  formatPhoneInput,
+  isValidLoginIdentifier,
+} from "@/lib/account-validation";
+
 import AuthField from "./auth-field";
 
 type LoginFormProps = {
@@ -22,48 +27,83 @@ export default function LoginForm({
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setMessage("");
-    setIsSubmitting(true);
 
     const formData = new FormData(event.currentTarget);
-    const response = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email: formData.get("email"),
-        password: formData.get("password"),
-        portal,
-      }),
-    });
-    const data = (await response.json()) as {
-      message?: string;
-      user?: { role?: string };
-    };
+    const identifier = String(formData.get("identifier") ?? "").trim();
 
-    setIsSubmitting(false);
-
-    if (!response.ok) {
-      setMessage(data.message ?? "Unable to login right now.");
+    if (!isValidLoginIdentifier(identifier)) {
+      setMessage("Enter a valid email or a +91 mobile number with 10 digits.");
       return;
     }
 
-    const destination =
-      redirectTo ??
-      (data.user?.role === "ADMIN" || data.user?.role === "STAFF"
-        ? "/admin"
-        : "/account");
+    setIsSubmitting(true);
 
-    router.push(destination);
-    router.refresh();
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          identifier: formData.get("identifier"),
+          password: formData.get("password"),
+          portal,
+        }),
+      });
+      const data = (await response.json().catch(() => ({}))) as {
+        message?: string;
+        user?: { role?: string };
+      };
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          setMessage(data.message ?? "Invalid email/phone or password.");
+          return;
+        }
+
+        if (response.status === 403 || response.status === 409) {
+          setMessage(data.message ?? "This account is not allowed to access this area.");
+          return;
+        }
+
+        if (response.status >= 500) {
+          setMessage("Login server is not working right now. Please try again shortly.");
+          return;
+        }
+
+        setMessage(
+          data.message ??
+            "Login server is not working right now. Please try again shortly.",
+        );
+        return;
+      }
+
+      const destination =
+        redirectTo ??
+        (data.user?.role === "ADMIN" || data.user?.role === "STAFF"
+          ? "/admin"
+          : "/account");
+
+      router.push(destination);
+      router.refresh();
+    } catch {
+      setMessage("Login server is not reachable. Please check your connection and try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
     <form className="grid gap-5" onSubmit={handleSubmit}>
       <AuthField
-        id="email"
-        name="email"
-        label="Email address"
-        type="email"
-        placeholder="you@example.com"
+        id="identifier"
+        name="identifier"
+        label="Email or phone"
+        type="text"
+        placeholder="you@example.com or +91 98765 43210"
+        onChange={(event) => {
+          const raw = event.target.value;
+          const next = /[a-z@]/i.test(raw) ? raw : formatPhoneInput(raw);
+          event.target.value = next;
+        }}
         required
       />
 

@@ -76,7 +76,7 @@ export default function SearchPageContent({
     <section className="mx-auto max-w-[1440px] px-5 py-14 sm:px-6 lg:px-10 lg:py-20">
       <div className="mb-10">
         <p className="mb-4 text-sm uppercase tracking-[4px] text-[var(--primary)]">
-          Search WOODLOOM
+          Search Shissoo
         </p>
 
         <h1 className="mb-6 max-w-[760px] text-4xl leading-[0.95] sm:text-5xl lg:text-7xl">

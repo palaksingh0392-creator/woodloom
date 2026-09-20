@@ -40,7 +40,7 @@ export default function Topbar() {
         <div className="flex items-center gap-2 opacity-90">
           <ShieldCheck size={15} />
 
-          <span>7-Day Easy Returns</span>
+          <span>Promise of Best Quality</span>
         </div>
 
         <div className="w-px h-4 bg-white/20" />

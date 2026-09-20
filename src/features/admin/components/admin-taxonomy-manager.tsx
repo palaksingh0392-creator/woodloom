@@ -1,8 +1,9 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Archive, Pencil, Plus, Save, X } from "lucide-react";
+import { Archive, Pencil, Plus, Save, Trash2, X } from "lucide-react";
 
 type TaxonomyItem = {
   id: string;
@@ -10,6 +11,7 @@ type TaxonomyItem = {
   slug: string;
   description: string | null;
   imageUrl: string | null;
+  filters?: string;
   isActive: boolean;
   sortOrder?: number;
   _count: { products: number };
@@ -21,6 +23,7 @@ type Draft = {
   slug: string;
   description: string;
   imageUrl: string;
+  filters: string;
   isActive: boolean;
   sortOrder: number;
 };
@@ -35,6 +38,7 @@ const emptyDraft: Draft = {
   slug: "",
   description: "",
   imageUrl: "",
+  filters: "",
   isActive: true,
   sortOrder: 0,
 };
@@ -47,8 +51,51 @@ export default function AdminTaxonomyManager({ items, type }: Props) {
   const [draft, setDraft] = useState<Draft>(emptyDraft);
   const [message, setMessage] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
   const plural = type === "category" ? "categories" : "collections";
   const endpoint = `/api/admin/${plural}`;
+
+  async function readResponse(response: Response) {
+    const text = await response.text();
+    try {
+      return JSON.parse(text) as { message?: string };
+    } catch {
+      throw new Error(
+        response.status === 404
+          ? `The ${type} endpoint was not found.`
+          : `The ${type} request failed (${response.status}).`,
+      );
+    }
+  }
+
+  async function uploadImage(file: File | undefined) {
+    if (!file) return;
+
+    setIsUploadingImage(true);
+    setMessage("");
+
+    const formData = new FormData();
+    formData.set("file", file);
+
+    try {
+      const response = await fetch("/api/admin/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const result = (await response.json()) as { url?: string; message?: string };
+
+      if (!response.ok || !result.url) {
+        throw new Error(result.message ?? "Image upload failed.");
+      }
+
+      const imageUrl = result.url;
+      setDraft((current) => ({ ...current, imageUrl }));
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Image upload failed.");
+    } finally {
+      setIsUploadingImage(false);
+    }
+  }
 
   function editItem(item: TaxonomyItem) {
     setDraft({
@@ -57,6 +104,7 @@ export default function AdminTaxonomyManager({ items, type }: Props) {
       slug: item.slug,
       description: item.description ?? "",
       imageUrl: item.imageUrl ?? "",
+      filters: item.filters ?? "",
       isActive: item.isActive,
       sortOrder: item.sortOrder ?? 0,
     });
@@ -72,7 +120,7 @@ export default function AdminTaxonomyManager({ items, type }: Props) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(draft),
     });
-    const result = (await response.json()) as { message?: string };
+    const result = await readResponse(response);
 
     setIsSaving(false);
 
@@ -86,7 +134,26 @@ export default function AdminTaxonomyManager({ items, type }: Props) {
   }
 
   async function deactivateItem(id: string) {
-    await fetch(`${endpoint}/${id}`, { method: "DELETE" });
+    setMessage("");
+    const response = await fetch(`${endpoint}/${id}`, { method: "DELETE" });
+    if (!response.ok) {
+      const result = await readResponse(response).catch(() => ({ message: undefined }));
+      setMessage(result.message ?? `Could not archive ${type}.`);
+      return;
+    }
+    router.refresh();
+  }
+
+  async function deleteItem(item: TaxonomyItem) {
+    if (!window.confirm(`Delete ${item.name} permanently?`)) return;
+
+    setMessage("");
+    const response = await fetch(`${endpoint}/${item.id}?hard=true`, { method: "DELETE" });
+    if (!response.ok) {
+      const result = await readResponse(response).catch(() => ({ message: undefined }));
+      setMessage(result.message ?? `Could not delete ${type}. Remove its products first.`);
+      return;
+    }
     router.refresh();
   }
 
@@ -125,14 +192,27 @@ export default function AdminTaxonomyManager({ items, type }: Props) {
               className={fieldClass}
             />
           ) : null}
-          <input
-            value={draft.imageUrl}
-            onChange={(event) =>
-              setDraft({ ...draft, imageUrl: event.target.value })
-            }
-            placeholder="Image URL"
-            className={fieldClass}
-          />
+          <label className="flex min-h-24 cursor-pointer flex-col items-center justify-center gap-2 rounded-md border border-dashed border-[var(--border)] px-3 py-3 text-center text-sm font-semibold text-[var(--text-secondary)] hover:border-[var(--primary)]">
+            <span>{isUploadingImage ? "Uploading..." : `Upload ${type} image`}</span>
+            <input
+              type="file"
+              accept="image/*"
+              disabled={isUploadingImage}
+              onChange={(event) => uploadImage(event.target.files?.[0])}
+              className="sr-only"
+            />
+          </label>
+          {draft.imageUrl ? (
+            <div className="overflow-hidden rounded-md border border-[var(--border)]">
+              <Image
+                src={draft.imageUrl}
+                alt={`${type} preview`}
+                width={800}
+                height={200}
+                className="h-28 w-full object-cover"
+              />
+            </div>
+          ) : null}
           <textarea
             rows={4}
             value={draft.description}
@@ -142,6 +222,14 @@ export default function AdminTaxonomyManager({ items, type }: Props) {
             placeholder="Description"
             className="rounded-md border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-sm outline-none focus:border-[var(--primary)]"
           />
+          {type === "category" ? (
+            <input
+              value={draft.filters}
+              onChange={(event) => setDraft({ ...draft, filters: event.target.value })}
+              placeholder="Filters, comma separated (Oak, Linen, Storage)"
+              className={fieldClass}
+            />
+          ) : null}
           <label className="flex items-center gap-3 text-sm font-semibold">
             <input
               type="checkbox"
@@ -237,6 +325,14 @@ export default function AdminTaxonomyManager({ items, type }: Props) {
                         className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-[var(--border)] text-red-600 disabled:opacity-30"
                       >
                         <Archive size={16} />
+                      </button>
+                      <button
+                        type="button"
+                        title={`Delete ${item.name}`}
+                        onClick={() => deleteItem(item)}
+                        className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-[var(--border)] text-red-600"
+                      >
+                        <Trash2 size={16} />
                       </button>
                     </div>
                   </td>

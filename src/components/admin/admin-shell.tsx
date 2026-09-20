@@ -3,9 +3,12 @@ import Link from "next/link";
 import {
   Boxes,
   FileText,
+  Home,
   Layers,
   LayoutDashboard,
   Mail,
+  Menu,
+  MapPin,
   MessageSquareText,
   PackageCheck,
   Settings,
@@ -14,31 +17,45 @@ import {
   Users,
 } from "lucide-react";
 
+import AdminLogoutButton from "@/components/admin/admin-logout-button";
+import AdminNotificationBell from "@/components/admin/admin-notification-bell";
+import BrandLogo from "@/components/brand/brand-logo";
+import type { AuthUser } from "@/lib/auth";
+
 const adminLinks = [
   { href: "/admin", label: "Overview", icon: LayoutDashboard },
+  { href: "/admin/home", label: "Home", icon: Home },
+  { href: "/admin/navigation", label: "Navbar", icon: Menu },
   { href: "/admin/orders", label: "Orders", icon: ShoppingBag },
   { href: "/admin/products", label: "Products", icon: PackageCheck },
   { href: "/admin/categories", label: "Categories", icon: Tags },
+  { href: "/admin/subcategories", label: "Sub-categories", icon: Tags },
   { href: "/admin/collections", label: "Collections", icon: Layers },
   { href: "/admin/blogs", label: "Blogs", icon: FileText },
   { href: "/admin/reviews", label: "Reviews", icon: MessageSquareText },
   { href: "/admin/messages", label: "Messages", icon: Mail },
   { href: "/admin/inventory", label: "Inventory", icon: Boxes },
   { href: "/admin/customers", label: "Customers", icon: Users },
+  { href: "/admin/store-locations", label: "Store Locations", icon: MapPin },
+  { href: "/admin/delivery-areas", label: "Delivery", icon: MapPin },
   { href: "/admin/system", label: "System", icon: Settings },
 ];
 
-export default function AdminShell({ children }: { children: React.ReactNode }) {
+export default function AdminShell({
+  admin,
+  children,
+}: {
+  admin: AuthUser;
+  children: React.ReactNode;
+}) {
   return (
-    <div className="min-h-screen bg-[var(--surface-soft)] text-[var(--text-primary)]">
-      <div className="grid min-h-screen lg:grid-cols-[260px_1fr]">
-        <aside className="border-b bg-[var(--surface)] lg:border-b-0 lg:border-r">
+    <div className="min-h-screen overflow-x-hidden bg-[var(--surface-soft)] text-[var(--text-primary)]">
+      <div className="grid min-h-screen min-w-0 lg:grid-cols-[260px_minmax(0,1fr)]">
+        <aside className="min-w-0 border-b bg-[var(--surface)] lg:border-b-0 lg:border-r">
           <div className="flex h-full flex-col">
             <div className="border-b px-5 py-5">
-              <Link href="/" className="block">
-                <span className="block font-serif text-2xl font-semibold">
-                  WOODLOOM
-                </span>
+              <Link href="/" aria-label="Shissoo home" className="block">
+                <BrandLogo size="compact" />
                 <span className="mt-1 block text-xs uppercase tracking-[0.18em] text-[var(--text-secondary)]">
                   Admin
                 </span>
@@ -68,9 +85,9 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
           </div>
         </aside>
 
-        <main className="min-w-0">
+        <main className="min-w-0 overflow-x-hidden">
           <header className="border-b bg-[var(--surface)] px-4 py-4 sm:px-6 lg:px-8">
-            <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+            <div className="mx-auto flex max-w-[1600px] flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-secondary)]">
                   Operations
@@ -80,16 +97,26 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
                 </h1>
               </div>
 
-              <Link
-                href="/"
-                className="text-sm font-medium text-[var(--primary)] hover:text-[var(--primary-hover)]"
-              >
-                View storefront
-              </Link>
+              <div className="flex flex-wrap items-center gap-3">
+                <AdminNotificationBell />
+                <div className="text-right">
+                  <p className="text-sm font-semibold">{admin.name}</p>
+                  <p className="text-xs text-[var(--text-secondary)]">
+                    {admin.role}
+                  </p>
+                </div>
+                <Link
+                  href="/"
+                  className="rounded-full bg-[var(--surface-muted)] px-4 py-2 text-sm font-medium text-[var(--primary)] hover:text-[var(--primary-hover)]"
+                >
+                  View storefront
+                </Link>
+                <AdminLogoutButton />
+              </div>
             </div>
           </header>
 
-          <div className="px-4 py-6 sm:px-6 lg:px-8">{children}</div>
+          <div className="mx-auto min-w-0 max-w-[1600px] px-4 py-6 sm:px-6 lg:px-8">{children}</div>
         </main>
       </div>
     </div>

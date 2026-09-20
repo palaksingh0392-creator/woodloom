@@ -50,7 +50,7 @@ export default function AdminMessagesTable({
   }
 
   return (
-    <div className="grid gap-6 xl:grid-cols-[1fr_420px]">
+    <div className="grid gap-6 xl:grid-cols-[minmax(0,1.7fr)_minmax(320px,420px)] xl:items-start">
       <section className="rounded-lg border bg-[var(--surface)]">
         <div className="border-b px-4 py-3">
           <h2 className="font-serif text-xl font-semibold">Contact messages</h2>

@@ -63,18 +63,24 @@ export default async function AdminOverview() {
               <p className="text-sm text-[var(--text-secondary)]">
                 Low stock alerts
               </p>
-              <strong className="mt-2 block text-3xl">
+              <Link
+                href="/admin/inventory?filter=low-stock"
+                className="mt-2 block text-3xl underline-offset-4 hover:underline"
+              >
                 {lowStockItems.length}
-              </strong>
+              </Link>
             </div>
 
             <div className="rounded-lg bg-[var(--surface-muted)] p-4">
               <p className="text-sm text-[var(--text-secondary)]">
                 Customers
               </p>
-              <strong className="mt-2 block text-3xl">
+              <Link
+                href="/admin/customers"
+                className="mt-2 block text-3xl underline-offset-4 hover:underline"
+              >
                 {customers.length}
-              </strong>
+              </Link>
             </div>
           </div>
         </AdminSectionCard>

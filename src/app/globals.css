@@ -11,6 +11,9 @@
 :root {
   /* LIGHT THEME */
 
+  --font-heading: "Playfair Display", Georgia, "Times New Roman", serif;
+  --font-body: Manrope, Inter, "Segoe UI", Arial, sans-serif;
+
   --background: #f7f3ee;
   --surface: #ffffff;
   --surface-muted: #efe7de;
@@ -19,8 +22,8 @@
   --surface-overlay: rgba(255, 255, 255, 0.88);
   --hero-scrim: rgba(247, 244, 239, 0.58);
 
-  --primary: #c49a6a;
-  --primary-hover: #b5895f;
+  --primary: #ad7a45;
+  --primary-hover: #966437;
 
   --text-primary: #2a241f;
   --text-secondary: #6f655d;
@@ -46,8 +49,8 @@
   --surface-overlay: rgba(43, 38, 34, 0.88);
   --hero-scrim: rgba(31, 27, 24, 0.84);
 
-  --primary: #c49a6a;
-  --primary-hover: #ddb383;
+  --primary: #b8834d;
+  --primary-hover: #d09a61;
 
   --text-primary: #f3ede7;
   --text-secondary: #b8ada1;
@@ -81,6 +84,10 @@ body {
   color: var(--text-primary);
 
   font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 
   min-height: 100vh;
   overflow-x: hidden;
@@ -90,10 +97,78 @@ body {
     color 0.3s ease;
 }
 
+.hover-label {
+  position: fixed;
+  z-index: 1000;
+  max-width: min(18rem, calc(100vw - 1.5rem));
+  transform: translateX(-50%);
+  color: var(--text-secondary);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+  pointer-events: none;
+  animation: hover-label-in 120ms ease-out;
+}
+
+.hover-label-above {
+  transform: translate(-50%, -100%);
+}
+
+@keyframes hover-label-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50%);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(-50%);
+  }
+}
+
 h1,
 h2,
 h3 {
   font-family: var(--font-heading);
+  font-weight: 600;
+  letter-spacing: -0.008em;
+}
+
+.home-page h1,
+.home-page h2,
+.home-page h3 {
+  font-weight: 400;
+}
+
+.home-page,
+.home-page * {
+  font-weight: 400 !important;
+}
+
+.home-page h1 {
+  font-size: clamp(2.25rem, 5vw, 4rem) !important;
+  line-height: 1.02;
+}
+
+.home-page h2 {
+  font-size: clamp(1.85rem, 3.5vw, 2.75rem) !important;
+  line-height: 1.08;
+}
+
+.home-page h3 {
+  font-size: clamp(1.25rem, 2.2vw, 1.5rem) !important;
+  line-height: 1.15;
+}
+
+.home-page > section:not(:first-child) {
+  padding-block: clamp(3rem, 5vw, 4.5rem) !important;
+}
+
+.home-page .mt-20 {
+  margin-top: 3rem !important;
 }
 .swiper {
   width: 100%;

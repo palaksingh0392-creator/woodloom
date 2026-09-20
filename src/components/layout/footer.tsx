@@ -10,6 +10,8 @@ import {
   FaLinkedinIn,
 } from "react-icons/fa";
 
+import BrandLogo from "@/components/brand/brand-logo";
+
 import NewsletterForm from "./newsletter-form";
 export default function FooterSection() {
   return (
@@ -17,7 +19,7 @@ export default function FooterSection() {
       className="
         bg-[#181512]
         text-white
-        mt-24
+        mt-16
       "
     >
       {/* TOP NEWSLETTER */}
@@ -35,11 +37,12 @@ export default function FooterSection() {
             px-6
             lg:px-10
 
-            py-20
+            py-12
+            lg:py-14
 
             grid
             lg:grid-cols-2
-            gap-14
+            gap-10
             items-center
           "
         >
@@ -51,7 +54,7 @@ export default function FooterSection() {
                 tracking-[4px]
                 text-sm
                 text-[#c8a27a]
-                mb-5
+                mb-3
               "
             >
               Stay Inspired
@@ -59,8 +62,8 @@ export default function FooterSection() {
 
             <h2
               className="
-                text-4xl
-                lg:text-6xl
+                text-3xl
+                lg:text-5xl
                 leading-[1.05]
                 font-serif
                 max-w-[620px]
@@ -75,9 +78,9 @@ export default function FooterSection() {
             <p
               className="
                 text-white/70
-                text-lg
+                text-base
                 leading-relaxed
-                mb-8
+                mb-6
                 max-w-[520px]
               "
             >
@@ -99,26 +102,18 @@ export default function FooterSection() {
           px-6
           lg:px-10
 
-          py-20
+          py-14
+          lg:py-16
 
           grid
           lg:grid-cols-12
-          gap-16
+          gap-10
         "
       >
         {/* BRAND */}
         <div className="lg:col-span-4">
-          <Link href="/">
-            <h2
-              className="
-                text-5xl
-                font-bold
-                tracking-tight
-                mb-3
-              "
-            >
-              WOODLOOM
-            </h2>
+          <Link href="/" aria-label="Shissoo home" className="inline-block">
+            <BrandLogo size="wide" className="mb-4" />
           </Link>
 
           <p
@@ -127,7 +122,7 @@ export default function FooterSection() {
               tracking-[5px]
               text-sm
               text-white/40
-              mb-8
+              mb-6
             "
           >
             Live Beautifully
@@ -150,7 +145,7 @@ export default function FooterSection() {
               flex
               items-center
               gap-4
-              mt-10
+              mt-8
             "
           >
             {/* INSTAGRAM */}
@@ -297,7 +292,7 @@ export default function FooterSection() {
 
             grid
             sm:grid-cols-3
-            gap-12
+            gap-8
           "
         >
           {/* SHOP */}
@@ -306,13 +301,13 @@ export default function FooterSection() {
               className="
                 text-lg
                 font-semibold
-                mb-6
+                mb-4
               "
             >
               Shop
             </h3>
 
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-3">
               <Link
                 href="/furniture/living-room"
                 className="text-white/60 hover:text-[#c8a27a] transition-colors"
@@ -356,13 +351,13 @@ export default function FooterSection() {
               className="
                 text-lg
                 font-semibold
-                mb-6
+                mb-4
               "
             >
               Company
             </h3>
 
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-3">
               <Link
                 href="/about"
                 className="text-white/60 hover:text-[#c8a27a] transition-colors"
@@ -392,13 +387,13 @@ export default function FooterSection() {
               className="
                 text-lg
                 font-semibold
-                mb-6
+                mb-4
               "
             >
               Support
             </h3>
 
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-3">
               <Link
                 href="/shipping-policy"
                 className="text-white/60 hover:text-[#c8a27a] transition-colors"
@@ -464,7 +459,7 @@ export default function FooterSection() {
               text-white/40
             "
           >
-            © 2026 WOODLOOM. All rights reserved.
+            © 2026 Shissoo. All rights reserved.
           </p>
 
           <div

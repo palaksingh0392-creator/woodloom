@@ -10,7 +10,13 @@ type Check = {
 function hasValue(key: string) {
   const value = process.env[key];
 
-  return Boolean(value && value.trim() && !value.includes("YOUR_PASSWORD"));
+  return Boolean(
+    value &&
+      value.trim() &&
+      !/YOUR_PASSWORD|your-16-character-google-app-password|your-16-char-app-password|replace-me|changeme/i.test(
+        value,
+      ),
+  );
 }
 
 const checks: Check[] = [

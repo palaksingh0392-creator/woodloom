@@ -48,6 +48,7 @@ export async function POST(request: Request) {
       address: body.address,
       addressId: body.addressId,
       paymentMethod: body.paymentMethod,
+      paymentPlan: body.paymentPlan,
     });
 
     return NextResponse.json(
@@ -58,6 +59,9 @@ export async function POST(request: Request) {
               subtotal: Number(order.subtotal),
               deliveryCharge: Number(order.shippingFee),
               total: Number(order.total),
+              paidAmount: Number(order.paidAmount),
+              dueAmount: Number(order.dueAmount),
+              paymentPlan: order.paymentPlan,
             }
           : null,
       },

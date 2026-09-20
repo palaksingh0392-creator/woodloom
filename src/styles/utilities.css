@@ -1,6 +1,26 @@
-.container-main {
-  width: min(1440px, calc(100% - 32px));
+* {
+  box-sizing: border-box;
+}
 
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+}
+
+img,
+svg,
+video {
+  display: block;
+  max-width: 100%;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+.container-main {
+  width: min(1440px, calc(100% - 20px));
   margin-inline: auto;
 }
 
@@ -31,7 +51,7 @@
 .card-surface {
   background: var(--surface);
 
-  border: 1px solid var(--border);
+  border: 2px solid var(--border);
 
   border-radius: 28px;
 

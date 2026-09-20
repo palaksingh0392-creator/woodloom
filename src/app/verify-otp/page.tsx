@@ -3,8 +3,8 @@ import AuthCard from "@/features/auth/components/auth-card";
 import OtpLoginForm from "@/features/auth/components/otp-login-form";
 
 export const metadata = {
-  title: "Verify OTP | WOODLOOM",
-  description: "Verify your WOODLOOM login OTP.",
+  title: "Verify OTP | Shissoo",
+  description: "Verify your Shissoo login OTP.",
 };
 
 export default function VerifyOtpPage() {

@@ -5,10 +5,12 @@ import MainLayout from "@/components/layout/main-layout";
 import { listPublishedBlogPosts } from "@/lib/blogs";
 
 export const metadata = {
-  title: "Journal | WOODLOOM",
+  title: "Journal | Shissoo",
   description:
-    "Read furniture buying guides, Scandinavian interior ideas, and room styling inspiration from WOODLOOM.",
+    "Read furniture buying guides, Scandinavian interior ideas, and room styling inspiration from Shissoo.",
 };
+
+export const dynamic = "force-dynamic";
 
 export default async function BlogPage() {
   const blogPosts = await listPublishedBlogPosts();
@@ -21,7 +23,7 @@ export default async function BlogPage() {
       <section className="mx-auto max-w-[1440px] px-5 py-14 sm:px-6 lg:px-10 lg:py-20">
         <div className="mb-12">
           <p className="mb-4 text-sm uppercase tracking-[4px] text-[var(--primary)]">
-            WOODLOOM Journal
+            Shissoo Journal
           </p>
 
           <h1 className="mb-6 max-w-[860px] text-4xl leading-[0.95] sm:text-5xl lg:text-7xl">

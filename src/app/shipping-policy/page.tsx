@@ -3,8 +3,8 @@ import PolicySection from "@/components/shared/policy-section";
 import StaticPage from "@/components/shared/static-page";
 
 export const metadata = {
-  title: "Shipping Policy | WOODLOOM",
-  description: "WOODLOOM shipping, delivery, and installation policy.",
+  title: "Shipping Policy | Shissoo",
+  description: "Shissoo shipping, delivery, and installation policy.",
 };
 
 export default function ShippingPolicyPage() {
@@ -17,7 +17,7 @@ export default function ShippingPolicyPage() {
       >
         <PolicySection title="Delivery Coverage">
           <p>
-            WOODLOOM currently communicates selected-city delivery support.
+            Shissoo currently communicates selected-city delivery support.
             Exact city eligibility, delivery charge, and installation options
             will later be calculated from backend service rules.
           </p>

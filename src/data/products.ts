@@ -14,6 +14,10 @@ export type Product = {
   badge?: string;
   images: string[];
   finishes: string[];
+  grades?: string[];
+  gradePriceAdjustments?: Record<string, number>;
+  variantPriceAdjustments?: Record<string, number>;
+  inventoryByFinish?: Record<string, number>;
 };
 
 export const products: Product[] = [

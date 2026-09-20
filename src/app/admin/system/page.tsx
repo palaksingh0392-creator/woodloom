@@ -1,6 +1,8 @@
 import AdminSectionCard from "@/features/admin/components/admin-section-card";
 import { getSystemHealth } from "@/lib/system-health";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminSystemPage() {
   const health = await getSystemHealth();
 

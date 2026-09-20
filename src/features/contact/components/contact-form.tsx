@@ -3,6 +3,8 @@
 import { FormEvent, useState } from "react";
 import { Send } from "lucide-react";
 
+import { formatPhoneInput } from "@/lib/account-validation";
+
 const fieldClass =
   "h-12 rounded-full border border-[var(--border)] bg-transparent px-4 outline-none focus:border-[var(--primary)]";
 
@@ -41,11 +43,11 @@ export default function ContactForm() {
   return (
     <form
       onSubmit={submitContact}
-      className="rounded-[22px] border border-[var(--border)] bg-[var(--surface)] p-6"
+      className="rounded-[22px] border border-[var(--border)] bg-[var(--surface)] p-4 sm:p-6"
     >
-      <h2 className="mb-5 text-3xl">Send A Message</h2>
+      <h2 className="mb-5 text-2xl sm:text-3xl">Send A Message</h2>
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-2">
         <input
           required
           name="name"
@@ -59,7 +61,16 @@ export default function ContactForm() {
           placeholder="Email address"
           className={fieldClass}
         />
-        <input name="phone" placeholder="Phone, optional" className={fieldClass} />
+        <input
+          name="phone"
+          type="tel"
+          maxLength={16}
+          placeholder="+91 98765 43210 (optional)"
+          onChange={(event) => {
+            event.currentTarget.value = formatPhoneInput(event.currentTarget.value);
+          }}
+          className={fieldClass}
+        />
         <input
           required
           name="subject"

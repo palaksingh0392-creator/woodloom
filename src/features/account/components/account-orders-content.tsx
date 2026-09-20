@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { PackageCheck } from "lucide-react";
 
 import type { AccountOrder } from "@/lib/orders";
+import { getDepartmentForOrderStatus } from "@/lib/order-status";
 import { formatPrice, useCommerceSelector } from "@/store/commerce-store";
 
 export default function AccountOrdersContent({
@@ -95,6 +96,58 @@ export default function AccountOrdersContent({
               </div>
             </div>
 
+            <div className="mb-5 grid gap-4 rounded-[20px] border border-[var(--border)] bg-[var(--surface-muted)] p-5 md:grid-cols-3">
+              <div>
+                <p className="text-sm text-[var(--text-secondary)]">Payment plan</p>
+                <p className="font-medium">
+                  {order.paymentPlan === "PARTIAL" ? "30% advance" : "Full payment"}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-[var(--text-secondary)]">Paid</p>
+                <p className="font-medium">{formatPrice(order.paidAmount)}</p>
+              </div>
+              <div>
+                <p className="text-sm text-[var(--text-secondary)]">Balance due</p>
+                <p className="font-medium">{formatPrice(order.dueAmount)}</p>
+              </div>
+              {order.refundTransactionId ? (
+                <div>
+                  <p className="text-sm text-[var(--text-secondary)]">Refund transaction</p>
+                  <p className="font-medium">{order.refundTransactionId}</p>
+                </div>
+              ) : null}
+            </div>
+
+            {order.trackingEvents.length > 0 ? (
+              <div className="mb-5 rounded-[20px] border border-[var(--border)] p-5">
+                <p className="mb-4 text-sm font-semibold uppercase tracking-[2px] text-[var(--text-secondary)]">
+                  Order tracking
+                </p>
+                <div className="grid gap-4">
+                  {order.trackingEvents.map((event, index) => (
+                    <div
+                      key={`${order.orderNumber}-${event.status}-${event.createdAt}`}
+                      className="grid grid-cols-[24px_1fr] gap-3"
+                    >
+                      <span className="mt-1 flex h-6 w-6 items-center justify-center rounded-full bg-[var(--primary)] text-xs font-semibold text-white">
+                        {index + 1}
+                      </span>
+                      <span>
+                        <span className="block font-medium">
+                          {getDepartmentForOrderStatus(event.status)} · {event.label}
+                        </span>
+                        <span className="text-sm text-[var(--text-secondary)]">
+                          {new Date(event.createdAt).toLocaleString("en-IN")}
+                          {event.notes ? ` - ${event.notes}` : ""}
+                        </span>
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+
             {order.items.map((item) => (
               <div
                 key={`${order.orderNumber}-${item.sku}`}
@@ -103,7 +156,7 @@ export default function AccountOrdersContent({
                 <div>
                   <h3 className="text-xl">{item.productName}</h3>
                   <p className="text-sm text-[var(--text-secondary)]">
-                    {item.sku} x {item.quantity}
+                    Code {item.productCode || "Not recorded"} · Variant code {item.sku} x {item.quantity}
                   </p>
                 </div>
                 <p className="font-semibold">{formatPrice(item.total)}</p>
@@ -180,9 +233,7 @@ export default function AccountOrdersContent({
           </div>
           <div>
             <p className="text-sm text-[var(--text-secondary)]">Payment</p>
-            <p className="font-medium">
-              {lastOrder.paymentMethod === "cod" ? "Cash On Delivery" : "Razorpay"}
-            </p>
+            <p className="font-medium">Razorpay / UPI</p>
           </div>
           <div>
             <p className="text-sm text-[var(--text-secondary)]">Items</p>

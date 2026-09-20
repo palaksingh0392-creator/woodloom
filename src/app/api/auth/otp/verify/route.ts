@@ -14,7 +14,7 @@ export async function POST(request: Request) {
     email?: string;
     otp?: string;
     challenge?: string;
-    purpose?: "login" | "password-reset";
+    purpose?: "login" | "password-reset" | "signup";
     newPassword?: string;
   };
   const email = body.email?.trim().toLowerCase();
@@ -42,6 +42,10 @@ export async function POST(request: Request) {
     );
   }
 
+  if (purpose === "signup") {
+    return NextResponse.json({ message: "Email verified successfully." });
+  }
+
   const user = await prisma.user.findUnique({ where: { email } });
 
   if (!user || user.status !== "ACTIVE") {
@@ -60,13 +64,21 @@ export async function POST(request: Request) {
 
     await prisma.user.update({
       where: { id: user.id },
-      data: { passwordHash: hashPassword(newPassword) },
+      data: {
+        passwordHash: hashPassword(newPassword),
+        emailVerifiedAt: user.emailVerifiedAt ?? new Date(),
+      },
     });
 
     return NextResponse.json({ message: "Password updated successfully." });
   }
 
   const role = user.role as UserRole;
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { emailVerifiedAt: user.emailVerifiedAt ?? new Date() },
+  });
+
   const response = NextResponse.json({
     user: {
       id: user.id,

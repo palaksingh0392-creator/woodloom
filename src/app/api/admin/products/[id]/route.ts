@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import {
   getAdminProduct,
+  getReadableAdminProductError,
   parseAdminProductInput,
   updateAdminProduct,
 } from "@/lib/admin-products";
@@ -54,8 +55,8 @@ export async function PATCH(request: Request, context: RouteContext) {
     return NextResponse.json(
       {
         message: conflict
-          ? "The product slug, product SKU, or variant SKU already exists."
-          : message,
+          ? "The product slug or product code already exists."
+          : getReadableAdminProductError(message),
       },
       { status: message === "Product not found." ? 404 : conflict ? 409 : 400 },
     );

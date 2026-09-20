@@ -48,7 +48,7 @@ export default function RoomInspiration() {
       <div className="max-w-[1600px] mx-auto px-6 lg:px-10">
         {/* HEADER */}
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-[14px] tracking-[3px] uppercase font-medium text-[var(--text-primary)]">
+          <h2 className="text-[14px] tracking-[3px] uppercase text-[var(--text-primary)]">
             Room Inspiration
           </h2>
 
@@ -108,7 +108,7 @@ export default function RoomInspiration() {
 
               {/* CONTENT */}
               <div className="absolute bottom-5 left-5 z-10 text-white">
-                <h3 className="text-[24px] font-medium mb-1 leading-none">
+                <h3 className="text-[24px] mb-1 leading-none">
                   {item.title}
                 </h3>
 

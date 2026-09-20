@@ -104,7 +104,7 @@ export default function ReviewsSection({
             </h2>
 
             <p className="max-w-[620px] text-[17px] leading-relaxed text-[var(--text-secondary)]">
-              Read verified impressions from customers styling WOODLOOM pieces
+              Read verified impressions from customers styling Shissoo pieces
               into warm, timeless living spaces.
             </p>
           </div>

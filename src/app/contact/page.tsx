@@ -5,8 +5,8 @@ import StaticPage from "@/components/shared/static-page";
 import ContactForm from "@/features/contact/components/contact-form";
 
 export const metadata = {
-  title: "Contact | WOODLOOM",
-  description: "Contact WOODLOOM for support, consultations, and store visits.",
+  title: "Contact | Shissoo",
+  description: "Contact Shissoo for support, consultations, and store visits.",
 };
 
 const contactOptions = [
@@ -20,7 +20,7 @@ const contactOptions = [
     icon: Mail,
     title: "Email",
     text: "For orders, returns, collaborations, and product support.",
-    value: "hello@woodloom.in",
+    value: "hello@shissoo.com",
   },
   {
     icon: Phone,
@@ -41,7 +41,7 @@ export default function ContactPage() {
     <MainLayout>
       <StaticPage
         eyebrow="Contact"
-        title="Talk To WOODLOOM"
+        title="Talk To Shissoo"
         description="Reach out for furniture guidance, order support, returns, or interior consultation requests."
       >
         <ContactForm />

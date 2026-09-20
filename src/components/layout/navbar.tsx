@@ -2,14 +2,22 @@
 
 import Link from "next/link";
 
-import { Heart, Search, ShieldCheck, ShoppingBag, User } from "lucide-react";
+import { ChevronDown, Heart, Search, ShieldCheck, ShoppingBag, User } from "lucide-react";
 
+import BrandLogo from "@/components/brand/brand-logo";
 import ThemeToggle from "@/components/ui/theme-toggle";
+import type { NavigationCategory, NavigationLink } from "@/lib/navigation";
 import { useCartCount, useWishlistCount } from "@/store/commerce-store";
 
 import Container from "../shared/container";
 
-export default function Navbar() {
+export default function Navbar({
+  links,
+  categories = [],
+}: {
+  links: NavigationLink[];
+  categories?: NavigationCategory[];
+}) {
   const cartCount = useCartCount();
   const wishlistCount = useWishlistCount();
 
@@ -29,86 +37,56 @@ export default function Navbar() {
       <Container>
         <div
           className="
-            h-20
-            lg:h-24
+            min-h-16
+            xl:min-h-20
+            py-1
 
             grid
             grid-cols-[minmax(0,1fr)_auto]
-            lg:grid-cols-3
+            xl:grid-cols-[minmax(260px,0.85fr)_minmax(320px,1fr)_auto]
 
             items-center
-            gap-3
+            gap-2
             sm:gap-4
+            max-[420px]:gap-1.5
           "
         >
           {/* LEFT */}
-          <div className="min-w-0">
+          <div className="min-w-0 shrink">
             <Link
               href="/"
-              className="
-                flex
-                flex-col
-                leading-none
-              "
+              aria-label="Shissoo home"
+              className="group block w-fit max-w-full transition-transform duration-200 hover:scale-[1.02]"
             >
-              <span
-                className="
-                  text-[1.5rem]
-                  max-[380px]:text-[1.25rem]
-                  sm:text-[2rem]
-                  font-bold
-                  tracking-tight
-                "
-              >
-                WOODLOOM
-              </span>
-
-              <span
-                className="
-                  text-[10px]
-                  max-[380px]:hidden
-                  tracking-[0.28em]
-                  uppercase
-
-                  text-muted
-
-                  mt-2
-                "
-              >
-                Live Beautifully
-              </span>
+              <BrandLogo
+                priority
+                size="wide"
+                className="w-[150px] max-w-full opacity-95 transition-opacity duration-200 group-hover:opacity-100 sm:w-[180px] xl:w-[220px]"
+              />
             </Link>
           </div>
 
-          {/* CENTER */}
-          <nav
-            className="
-              hidden
-              lg:flex
-
-              items-center
-              justify-center
-              gap-10
-            "
+          {/* CENTER SEARCH */}
+          <form
+            action="/search"
+            method="get"
+            data-hover-label="Search"
+            className="hidden h-11 w-full max-w-[560px] items-center justify-self-center rounded-md border border-[var(--border)] bg-[var(--surface)] px-4 transition-colors duration-200 hover:border-[var(--primary)] focus-within:border-[var(--primary)] xl:flex"
           >
-            <Link href="/furniture/living-room">LivingRoom</Link>
-
-            <Link href="/furniture/bedroom">Bedroom</Link>
-
-            <Link href="/furniture/dining-room">Dining</Link>
-
-            <Link href="/furniture/office">Office</Link>
-
-            <Link href="/furniture/decor">Decor</Link>
-
-            <Link href="/furniture">Collections</Link>
-
-           <Link
-                href="/blog"
-              >
-               Blog
-              </Link>
-          </nav>
+            <input
+              name="q"
+              aria-label="Search products"
+              placeholder="Search products, materials, or categories"
+              className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-[var(--text-secondary)]"
+            />
+            <button
+              type="submit"
+              aria-label="Submit search"
+              className="ml-3 text-[var(--text-secondary)] transition-colors hover:text-[var(--primary)]"
+            >
+              <Search size={21} />
+            </button>
+          </form>
 
           {/* RIGHT */}
           <div
@@ -116,40 +94,35 @@ export default function Navbar() {
               flex
               items-center
               justify-end
-              gap-3
-              max-[380px]:gap-2
+              gap-2
+              max-[380px]:gap-1.5
               sm:gap-5
             "
           >
             <Link
               href="/search"
               aria-label="Search"
-              className="hidden h-10 w-10 items-center justify-center rounded-full transition-colors hover:bg-[var(--surface-muted)] sm:flex"
+              data-hover-label="Search"
+              className="flex h-9 w-9 items-center justify-center rounded-full transition-all duration-200 hover:scale-105 hover:bg-[var(--surface-muted)] hover:text-[var(--primary)] xl:hidden"
             >
-              <Search size={22} />
+              <Search size={21} />
             </Link>
 
             <Link
               href="/account"
               aria-label="Account"
-              className="hidden h-10 w-10 items-center justify-center rounded-full transition-colors hover:bg-[var(--surface-muted)] sm:flex"
+              data-hover-label="Account"
+              className="hidden h-10 w-10 items-center justify-center rounded-full transition-all duration-200 hover:scale-105 hover:bg-[var(--surface-muted)] hover:text-[var(--primary)] sm:flex"
             >
               <User size={22} />
             </Link>
 
-            <Link
-              href="/admin-login"
-              aria-label="Admin login"
-              title="Admin login"
-              className="flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:bg-[var(--surface-muted)] sm:h-10 sm:w-10"
-            >
-              <ShieldCheck size={22} />
-            </Link>
 
             <Link
               href="/wishlist"
               aria-label="Wishlist"
-              className="relative flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:bg-[var(--surface-muted)] sm:h-10 sm:w-10"
+              data-hover-label="Wishlist"
+              className="group relative flex h-9 w-9 items-center justify-center rounded-full transition-all duration-200 hover:scale-105 hover:bg-[var(--surface-muted)] hover:text-[var(--primary)] sm:h-10 sm:w-10"
             >
               <Heart size={22} />
 
@@ -183,7 +156,8 @@ export default function Navbar() {
             <Link
               href="/cart"
               aria-label="Cart"
-              className="relative flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:bg-[var(--surface-muted)] sm:h-10 sm:w-10"
+              data-hover-label="Cart"
+              className="group relative flex h-9 w-9 items-center justify-center rounded-full transition-all duration-200 hover:scale-105 hover:bg-[var(--surface-muted)] hover:text-[var(--primary)] sm:h-10 sm:w-10"
             >
               <ShoppingBag size={22} />
 
@@ -213,24 +187,107 @@ export default function Navbar() {
                 </span>
               )}
             </Link>
-
-            <ThemeToggle />
+            <Link
+              href="/admin-login"
+              aria-label="Admin login"
+              title="Admin login"
+              data-hover-label="Admin login"
+              className="flex h-8 w-8 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--surface)] transition-all duration-200 hover:scale-105 hover:border-[var(--primary)] hover:text-[var(--primary)] sm:h-9 sm:w-9"
+            >
+              <ShieldCheck size={18} />
+            </Link>
+            <span className="hidden xl:block"><ThemeToggle /></span>
           </div>
         </div>
 
-        <nav className="flex h-11 items-center gap-5 overflow-x-auto border-t text-sm font-medium text-[var(--text-secondary)] scrollbar-hide lg:hidden">
-          <Link href="/products" className="shrink-0 hover:text-[var(--text-primary)]">
-            Products
-          </Link>
-          <Link href="/furniture" className="shrink-0 hover:text-[var(--text-primary)]">
-            Collections
-          </Link>
-          <Link href="/blog" className="shrink-0 hover:text-[var(--text-primary)]">
-            Blog
-          </Link>
-          <Link href="/search" className="shrink-0 hover:text-[var(--text-primary)]">
-            Search
-          </Link>
+        <nav className="hidden min-h-10 items-center justify-center gap-x-5 gap-y-1 border-t border-[var(--border)] py-0.5 text-sm font-medium text-[var(--text-secondary)] xl:flex xl:flex-wrap">
+          {links.map((link) => (
+            (() => {
+              const category = categories.find(
+                (item) => link.href === `/furniture/${item.slug}`,
+              );
+
+              return (
+                <div key={link.id} className="group relative shrink-0">
+                  <Link
+                    href={link.href}
+                    data-hover-label={link.label}
+                    data-hover-label-placement="above"
+                    className="relative inline-flex items-center gap-1 rounded-md px-2 py-2 text-center transition-colors duration-200 hover:bg-[var(--surface-muted)] hover:text-[var(--text-primary)]"
+                  >
+                    {link.label}
+                    {category?.subcategories.length ? <ChevronDown size={13} aria-hidden="true" /> : null}
+                    <span
+                      aria-hidden="true"
+                      className="absolute inset-x-2 -bottom-0.5 h-0.5 origin-center scale-x-0 rounded-full bg-[var(--primary)] transition-transform duration-200 group-hover:scale-x-100"
+                    />
+                  </Link>
+                  {category?.subcategories.length ? (
+                    <div className="invisible absolute left-1/2 top-full z-50 w-56 -translate-x-1/2 translate-y-1 rounded-md border border-[var(--border)] bg-[var(--surface)] p-2 opacity-0 shadow-xl transition-all duration-150 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100">
+                      <Link href={link.href} className="block rounded px-3 py-2 text-sm font-semibold hover:bg-[var(--surface-muted)]">
+                        All {category.name}
+                      </Link>
+                      {category.subcategories.map((subcategory) => (
+                        <Link
+                          key={subcategory.id}
+                          href={`${link.href}?subcategory=${subcategory.slug}`}
+                          className="block rounded px-3 py-2 text-sm text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] hover:text-[var(--text-primary)]"
+                        >
+                          {subcategory.name}
+                        </Link>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+              );
+            })()
+          ))}
+        </nav>
+
+        <nav className="flex h-11 items-center gap-5 overflow-x-auto border-t text-sm font-medium text-[var(--text-secondary)] scrollbar-hide xl:hidden">
+          {links.map((link) => (
+            (() => {
+              const category = categories.find(
+                (item) => link.href === `/furniture/${item.slug}`,
+              );
+
+              if (!category?.subcategories.length) {
+                return (
+                  <Link
+                    key={link.id}
+                    href={link.href}
+                    data-hover-label={link.label}
+                    data-hover-label-placement="above"
+                    className="group relative shrink-0 rounded-md px-2 py-1.5 transition-colors duration-200 hover:bg-[var(--surface-muted)] hover:text-[var(--text-primary)]"
+                  >
+                    {link.label}
+                    <span aria-hidden="true" className="absolute inset-x-2 -bottom-0.5 h-0.5 origin-center scale-x-0 rounded-full bg-[var(--primary)] transition-transform duration-200 group-hover:scale-x-100" />
+                  </Link>
+                );
+              }
+
+              return (
+                <details key={link.id} className="relative shrink-0">
+                  <summary
+                    data-hover-label={link.label}
+                    data-hover-label-placement="above"
+                    className="flex cursor-pointer list-none items-center gap-1 rounded-md px-2 py-1.5 hover:bg-[var(--surface-muted)] hover:text-[var(--text-primary)]"
+                  >
+                    {link.label}
+                    <ChevronDown size={13} aria-hidden="true" />
+                  </summary>
+                  <div className="absolute left-0 top-full z-50 mt-1 w-52 rounded-md border border-[var(--border)] bg-[var(--surface)] p-2 shadow-xl">
+                    <Link href={link.href} className="block rounded px-3 py-2 text-sm font-semibold hover:bg-[var(--surface-muted)]">All {category.name}</Link>
+                    {category.subcategories.map((subcategory) => (
+                      <Link key={subcategory.id} href={`${link.href}?subcategory=${subcategory.slug}`} className="block rounded px-3 py-2 text-sm hover:bg-[var(--surface-muted)]">
+                        {subcategory.name}
+                      </Link>
+                    ))}
+                  </div>
+                </details>
+              );
+            })()
+          ))}
         </nav>
       </Container>
     </header>

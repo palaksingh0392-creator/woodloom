@@ -47,7 +47,7 @@ export default function AccountShell({ children }: { children: ReactNode }) {
         </p>
 
         <h1 className="mb-5 text-4xl leading-[0.95] sm:text-5xl lg:text-7xl">
-          Your WOODLOOM Space
+          Your Shissoo Space
         </h1>
 
         <p className="max-w-[620px] text-[17px] leading-relaxed text-[var(--text-secondary)]">
@@ -64,13 +64,13 @@ export default function AccountShell({ children }: { children: ReactNode }) {
             border
             border-[var(--border)]
             bg-[var(--surface)]
-            p-4
+            p-3
             lg:sticky
             lg:top-32
             lg:self-start
           "
         >
-          <nav className="flex gap-2 overflow-x-auto lg:grid lg:overflow-visible">
+          <nav className="flex gap-2 overflow-x-auto pb-1 lg:grid lg:overflow-visible">
             {accountLinks.map((item) => {
               const Icon = item.icon;
               const isActive = pathname === item.href;
@@ -103,11 +103,13 @@ export default function AccountShell({ children }: { children: ReactNode }) {
               );
             })}
 
-            <LogoutButton />
+            <div className="min-w-fit">
+              <LogoutButton />
+            </div>
           </nav>
         </aside>
 
-        <div>{children}</div>
+        <div className="min-w-0">{children}</div>
       </div>
     </section>
   );

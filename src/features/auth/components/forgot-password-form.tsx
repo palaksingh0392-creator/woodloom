@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { FormEvent, useState } from "react";
 
+import { isValidEmail } from "@/lib/account-validation";
+
 import AuthField from "./auth-field";
 
 export default function ForgotPasswordForm() {
@@ -16,59 +18,91 @@ export default function ForgotPasswordForm() {
   const [isComplete, setIsComplete] = useState(false);
 
   async function requestOtp() {
-    setMessage("");
-    setIsSubmitting(true);
-
-    const response = await fetch("/api/auth/otp/request", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, purpose: "password-reset" }),
-    });
-    const data = (await response.json()) as {
-      message?: string;
-      challenge?: string;
-      devOtp?: string;
-    };
-
-    setIsSubmitting(false);
-
-    if (!response.ok || !data.challenge) {
-      setMessage(data.message ?? "Unable to send reset OTP.");
+    if (!email.trim() || !isValidEmail(email)) {
+      setMessage("Enter a valid email address first.");
       return;
     }
 
-    setChallenge(data.challenge);
-    setDevOtp(data.devOtp ?? "");
-    setMessage("Reset OTP sent. Check your email or use the local development code below.");
+    setMessage("");
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch("/api/auth/otp/request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, purpose: "password-reset" }),
+      });
+
+      const data = (await response.json().catch(() => ({}))) as {
+        message?: string;
+        challenge?: string;
+        devOtp?: string;
+      };
+
+      setIsSubmitting(false);
+
+      if (!response.ok || !data.challenge) {
+        setMessage(data.message ?? "Unable to send reset OTP.");
+        return;
+      }
+
+      setChallenge(data.challenge);
+      setDevOtp(data.devOtp ?? "");
+      setMessage(
+        data.devOtp
+          ? "Reset OTP created in local mode. Use the local development code below."
+          : "Reset OTP sent. Please check your email.",
+      );
+    } catch {
+      setIsSubmitting(false);
+      setMessage("Reset OTP could not be sent. Please try again.");
+    }
   }
 
   async function resetPassword(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setMessage("");
-    setIsSubmitting(true);
 
-    const response = await fetch("/api/auth/otp/verify", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email,
-        otp,
-        challenge,
-        purpose: "password-reset",
-        newPassword,
-      }),
-    });
-    const data = (await response.json()) as { message?: string };
-
-    setIsSubmitting(false);
-
-    if (!response.ok) {
-      setMessage(data.message ?? "Unable to reset password.");
+    if (!isValidEmail(email)) {
+      setMessage("Enter a valid email address first.");
       return;
     }
 
-    setIsComplete(true);
-    setMessage("Password updated successfully.");
+    if (!challenge || otp.length < 6 || newPassword.length < 8) {
+      setMessage("Enter the OTP and a valid new password.");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch("/api/auth/otp/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          otp,
+          challenge,
+          purpose: "password-reset",
+          newPassword,
+        }),
+      });
+
+      const data = (await response.json().catch(() => ({}))) as { message?: string };
+
+      setIsSubmitting(false);
+
+      if (!response.ok) {
+        setMessage(data.message ?? "Unable to reset password.");
+        return;
+      }
+
+      setIsComplete(true);
+      setMessage("Password updated successfully.");
+    } catch {
+      setIsSubmitting(false);
+      setMessage("Reset request could not be completed. Please try again.");
+    }
   }
 
   if (isComplete) {
@@ -149,7 +183,7 @@ export default function ForgotPasswordForm() {
       <button
         type="submit"
         disabled={isSubmitting || !challenge || otp.length < 6 || newPassword.length < 8}
-        className="h-14 rounded-full bg-[var(--primary)] px-8 text-sm uppercase tracking-[2px] text-white disabled:opacity-60"
+        className="h-14 rounded-full bg-[var(--primary)] px-8 text-sm uppercase tracking-[2px] text-white disabled:cursor-not-allowed disabled:opacity-60"
       >
         {isSubmitting ? "Updating" : "Update Password"}
       </button>

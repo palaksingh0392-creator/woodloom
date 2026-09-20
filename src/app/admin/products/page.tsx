@@ -76,7 +76,7 @@ export default async function AdminProductsPage() {
                         <div>
                           <strong className="block">{product.name}</strong>
                           <span className="text-xs text-[var(--text-secondary)]">
-                            {product.sku} · {product.category.name}
+                            {product.productCode ?? product.sku} · {product.category.name}
                           </span>
                         </div>
                       </div>

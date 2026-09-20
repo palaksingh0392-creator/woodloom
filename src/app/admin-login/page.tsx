@@ -3,8 +3,8 @@ import AuthCard from "@/features/auth/components/auth-card";
 import LoginForm from "@/features/auth/components/login-form";
 
 export const metadata = {
-  title: "Admin Login | WOODLOOM",
-  description: "Secure login for WOODLOOM administrators and staff.",
+  title: "Admin Login | Shissoo",
+  description: "Secure login for Shissoo administrators and staff.",
 };
 
 export default function AdminLoginPage() {
@@ -12,7 +12,7 @@ export default function AdminLoginPage() {
     <MainLayout>
       <AuthCard
         eyebrow="Admin Access"
-        title="WOODLOOM Operations Login"
+        title="Shissoo Operations Login"
         description="Sign in with an approved administrator or staff account to manage orders, products, inventory, and customers."
         footerText="Shopping as a customer?"
         footerHref="/login"

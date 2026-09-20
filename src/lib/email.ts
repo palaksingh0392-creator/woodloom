@@ -1,7 +1,6 @@
-import "server-only";
-
 import net from "node:net";
 import tls from "node:tls";
+import { randomUUID } from "node:crypto";
 
 type AuthEmailInput = {
   to: string;
@@ -9,18 +8,44 @@ type AuthEmailInput = {
   text: string;
 };
 
+const placeholderPasswordPatterns = [/your-16-char-app-password/i, /replace-me/i, /changeme/i];
+
 export async function sendAuthEmail(input: AuthEmailInput) {
   if (process.env.EMAIL_DELIVERY_MODE === "smtp") {
-    await sendSmtpEmail(input);
+    if (isPlaceholderSmtpSetup()) {
+      throw new Error(
+        "SMTP is enabled but real SMTP credentials are not configured.",
+      );
+    }
 
+    await sendSmtpEmail(input);
     return { delivered: true };
   }
 
-  console.info(`[WOODLOOM email] To: ${input.to}`);
-  console.info(`[WOODLOOM email] Subject: ${input.subject}`);
-  console.info(`[WOODLOOM email] ${input.text}`);
+  console.info(`[Shissoo email] To: ${input.to}`);
+  console.info(`[Shissoo email] Subject: ${input.subject}`);
+  console.info(`[Shissoo email] ${input.text}`);
 
   return { delivered: false };
+}
+
+function isPlaceholderSmtpSetup() {
+  const pass = process.env.SMTP_PASS ?? "";
+  const host = process.env.SMTP_HOST ?? "";
+  const user = process.env.SMTP_USER ?? "";
+
+  const hasPlaceholderPassword = placeholderPasswordPatterns.some((pattern) =>
+    pattern.test(pass),
+  );
+
+  return Boolean(
+    !host ||
+      !user ||
+      !pass ||
+      hasPlaceholderPassword ||
+      pass.includes("YOUR_") ||
+      pass.includes("your-"),
+  );
 }
 
 function getSmtpConfig() {
@@ -55,12 +80,17 @@ function formatAddress(value: string) {
 }
 
 function buildMessage(input: AuthEmailInput, from: string) {
+  const senderDomain = from.split("@")[1]?.replace(/[>]/g, "") ?? "shissoo.com";
   const headers = [
-    `From: WOODLOOM ${formatAddress(from)}`,
+    `From: Shissoo ${formatAddress(from)}`,
     `To: ${formatAddress(input.to)}`,
+    `Reply-To: ${formatAddress(from)}`,
     `Subject: ${input.subject.replace(/\r?\n/g, " ")}`,
+    `Date: ${new Date().toUTCString()}`,
+    `Message-ID: <${randomUUID()}@${senderDomain}>`,
     "MIME-Version: 1.0",
     "Content-Type: text/plain; charset=utf-8",
+    "Content-Transfer-Encoding: 8bit",
   ];
 
   return `${headers.join("\r\n")}\r\n\r\n${input.text}\r\n.`;
@@ -142,12 +172,12 @@ async function sendSmtpEmail(input: AuthEmailInput) {
 
   try {
     await readSmtpResponse(socket);
-    await writeCommand(socket, `EHLO ${process.env.SMTP_HELO_HOST ?? "woodloom.local"}`);
+    await writeCommand(socket, `EHLO ${process.env.SMTP_HELO_HOST ?? config.host}`);
 
     if (!config.secure) {
       await writeCommand(socket, "STARTTLS");
       socket = await upgradeToTls(socket as net.Socket, config.host);
-      await writeCommand(socket, `EHLO ${process.env.SMTP_HELO_HOST ?? "woodloom.local"}`);
+      await writeCommand(socket, `EHLO ${process.env.SMTP_HELO_HOST ?? config.host}`);
     }
 
     await writeCommand(socket, "AUTH LOGIN");

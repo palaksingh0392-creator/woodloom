@@ -3,8 +3,8 @@ import AuthCard from "@/features/auth/components/auth-card";
 import ForgotPasswordForm from "@/features/auth/components/forgot-password-form";
 
 export const metadata = {
-  title: "Forgot Password | WOODLOOM",
-  description: "Reset your WOODLOOM account password.",
+  title: "Forgot Password | Shissoo",
+  description: "Reset your Shissoo account password.",
 };
 
 export default function ForgotPasswordPage() {

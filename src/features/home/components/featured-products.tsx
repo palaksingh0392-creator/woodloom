@@ -107,6 +107,8 @@ export default function FeaturedProducts({ products }: { products: Product[] }) 
 
         <div className="relative">
           <button
+            type="button"
+            aria-label="View previous featured products"
             onClick={() => swiperRef.current?.slidePrev()}
             className="
               absolute
@@ -131,6 +133,8 @@ export default function FeaturedProducts({ products }: { products: Product[] }) 
           </button>
 
           <button
+            type="button"
+            aria-label="View next featured products"
             onClick={() => swiperRef.current?.slideNext()}
             className="
               absolute

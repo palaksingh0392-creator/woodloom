@@ -23,8 +23,10 @@ export default async function EditAdminProductPage({ params }: Props) {
     id: product.id,
     name: product.name,
     slug: product.slug,
+    productCode: product.productCode ?? product.sku,
     sku: product.sku,
     categoryId: product.categoryId,
+    subcategoryId: product.subcategoryId ?? "",
     collectionId: product.collectionId ?? "",
     shortDescription: product.shortDescription,
     description: product.description,
@@ -41,10 +43,12 @@ export default async function EditAdminProductPage({ params }: Props) {
     variants: product.variants.map((variant) => ({
       id: variant.id,
       finish: variant.finish,
+      grade: variant.grade ?? "",
       color: variant.color ?? "",
       sku: variant.sku,
       stock: variant.stock,
       reorderAt: variant.reorderAt,
+      priceAdjustment: Number(variant.priceAdjustment),
     })),
   };
 
@@ -53,6 +57,11 @@ export default async function EditAdminProductPage({ params }: Props) {
       categories={options.categories.map(({ id: optionId, name }) => ({
         id: optionId,
         name,
+      }))}
+      subcategories={options.subcategories.map(({ id: optionId, name, categoryId }) => ({
+        id: optionId,
+        name,
+        categoryId,
       }))}
       collections={options.collections.map(({ id: optionId, name }) => ({
         id: optionId,

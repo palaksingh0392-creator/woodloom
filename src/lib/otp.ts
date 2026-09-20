@@ -9,7 +9,7 @@ import {
 } from "@/lib/auth";
 import { sendAuthEmail } from "@/lib/email";
 
-type OtpPurpose = "login" | "password-reset";
+type OtpPurpose = "login" | "password-reset" | "signup";
 
 type OtpPayload = {
   email: string;
@@ -42,19 +42,33 @@ export async function createOtpChallenge(input: {
   });
   const subject =
     input.purpose === "login"
-      ? "Your WOODLOOM login OTP"
-      : "Your WOODLOOM password reset OTP";
+      ? "Your Shissoo login OTP"
+      : input.purpose === "password-reset"
+        ? "Your Shissoo password reset OTP"
+        : "Verify your Shissoo email";
 
-  await sendAuthEmail({
+  const delivery = await sendAuthEmail({
     to: input.email,
     subject,
-    text: `Your WOODLOOM OTP is ${otp}. It expires in 10 minutes.`,
+    text:
+      input.purpose === "signup"
+        ? `Your Shissoo email verification code is ${otp}. It expires in 10 minutes.`
+        : `Your Shissoo OTP is ${otp}. It expires in 10 minutes.`,
   });
+
+  if (process.env.NODE_ENV === "production" && !delivery.delivered) {
+    throw new Error("Email delivery is not configured for verification codes.");
+  }
+
+  const shouldExposeDevOtp =
+    process.env.NODE_ENV !== "production" &&
+    process.env.EMAIL_DELIVERY_MODE === "local";
 
   return {
     challenge,
     expiresAt,
-    devOtp: process.env.EMAIL_DELIVERY_MODE === "smtp" ? undefined : otp,
+    delivered: delivery.delivered,
+    devOtp: shouldExposeDevOtp ? otp : undefined,
   };
 }
 

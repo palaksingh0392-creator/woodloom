@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import {
   createAdminProduct,
+  getReadableAdminProductError,
   listAdminProducts,
   parseAdminProductInput,
 } from "@/lib/admin-products";
@@ -42,8 +43,8 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         message: conflict
-          ? "The product slug, product SKU, or variant SKU already exists."
-          : message,
+          ? "The product slug or product code already exists."
+          : getReadableAdminProductError(message),
       },
       { status: conflict ? 409 : 400 },
     );

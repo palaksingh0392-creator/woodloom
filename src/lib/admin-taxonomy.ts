@@ -8,6 +8,7 @@ export type CategoryInput = {
   slug: string;
   description?: string;
   imageUrl?: string;
+  filters: string;
   isActive: boolean;
   sortOrder: number;
 };
@@ -18,6 +19,14 @@ export type CollectionInput = {
   description?: string;
   imageUrl?: string;
   isActive: boolean;
+};
+
+export type SubcategoryInput = {
+  name: string;
+  slug: string;
+  categoryId: string;
+  isActive: boolean;
+  sortOrder: number;
 };
 
 function optionalText(value: unknown) {
@@ -42,6 +51,7 @@ function parseBase(body: unknown) {
     slug: slugifyProductName(optionalText(input.slug) ?? name),
     description: optionalText(input.description),
     imageUrl: optionalText(input.imageUrl),
+    filters: typeof input.filters === "string" ? input.filters.trim() : "",
     isActive: input.isActive !== false,
   };
 }
@@ -60,6 +70,20 @@ export function parseCategoryInput(body: unknown): CategoryInput {
 
 export function parseCollectionInput(body: unknown): CollectionInput {
   return parseBase(body);
+}
+
+export function parseSubcategoryInput(body: unknown): SubcategoryInput {
+  const base = parseBase(body);
+  const input = body as Record<string, unknown>;
+  const categoryId = optionalText(input.categoryId);
+  const sortOrder = Number(input.sortOrder ?? 0);
+
+  if (!categoryId) throw new Error("Category is required.");
+  if (!Number.isInteger(sortOrder) || sortOrder < 0) {
+    throw new Error("Sort order must be a positive whole number.");
+  }
+
+  return { name: base.name, slug: base.slug, categoryId, isActive: base.isActive, sortOrder };
 }
 
 export async function listAdminCategories() {
@@ -84,12 +108,38 @@ export async function listAdminCollections() {
   });
 }
 
+export async function listAdminSubcategories() {
+  try {
+    return await prisma.subcategory.findMany({
+      include: { category: true, _count: { select: { products: true } } },
+      orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+    });
+  } catch (error) {
+    console.warn("Subcategory table is unavailable until the database is updated:", error);
+    return [];
+  }
+}
+
+export async function upsertAdminSubcategory(input: SubcategoryInput, id?: string) {
+  const data = {
+    name: input.name,
+    slug: input.slug,
+    categoryId: input.categoryId,
+    isActive: input.isActive,
+    sortOrder: input.sortOrder,
+  };
+
+  if (id) return prisma.subcategory.update({ where: { id }, data });
+  return prisma.subcategory.create({ data });
+}
+
 export async function upsertAdminCategory(input: CategoryInput, id?: string) {
   const data = {
     name: input.name,
     slug: input.slug,
     description: input.description,
     imageUrl: input.imageUrl,
+    filters: input.filters,
     isActive: input.isActive,
     sortOrder: input.sortOrder,
   };

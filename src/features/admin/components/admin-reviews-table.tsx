@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { Eye, EyeOff, Star, Trash2 } from "lucide-react";
 
 import type { AdminProductReview } from "@/lib/reviews";
@@ -12,20 +13,29 @@ export default function AdminReviewsTable({
   reviews: AdminProductReview[];
 }) {
   const router = useRouter();
+  const [message, setMessage] = useState("");
 
   async function updateVisibility(id: string, isVisible: boolean) {
-    await fetch(`/api/admin/reviews/${id}`, {
+    const response = await fetch(`/api/admin/reviews/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ isVisible }),
     });
+    if (!response.ok) {
+      setMessage("Could not update review visibility.");
+      return;
+    }
     router.refresh();
   }
 
   async function deleteReview(id: string) {
-    await fetch(`/api/admin/reviews/${id}`, {
+    const response = await fetch(`/api/admin/reviews/${id}`, {
       method: "DELETE",
     });
+    if (!response.ok) {
+      setMessage("Could not delete review.");
+      return;
+    }
     router.refresh();
   }
 
@@ -40,6 +50,7 @@ export default function AdminReviewsTable({
 
   return (
     <div className="overflow-x-auto">
+      {message ? <p className="mb-4 text-sm text-red-600">{message}</p> : null}
       <table className="w-full min-w-[900px] text-left text-sm">
         <thead className="text-xs uppercase text-[var(--text-secondary)]">
           <tr className="border-b">

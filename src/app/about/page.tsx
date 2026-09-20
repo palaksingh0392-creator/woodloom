@@ -4,8 +4,8 @@ import MainLayout from "@/components/layout/main-layout";
 import StaticPage from "@/components/shared/static-page";
 
 export const metadata = {
-  title: "About | WOODLOOM",
-  description: "Learn about WOODLOOM's premium wooden furniture philosophy.",
+  title: "About | Shissoo",
+  description: "Learn about Shissoo's premium wooden furniture philosophy.",
 };
 
 const values = [
@@ -30,16 +30,16 @@ export default function AboutPage() {
   return (
     <MainLayout>
       <StaticPage
-        eyebrow="About WOODLOOM"
+        eyebrow="About Shissoo"
         title="Furniture For Warm Modern Homes"
-        description="WOODLOOM is a premium wooden furniture concept focused on Scandinavian calm, Indian home needs, and a conversion-ready digital experience."
+        description="Shissoo is a premium wooden furniture concept focused on Scandinavian calm, Indian home needs, and a conversion-ready digital experience."
       >
         <div className="rounded-[24px] border border-[var(--border)] bg-[var(--surface)] p-7">
           <h2 className="mb-4 text-3xl">Our Philosophy</h2>
           <p className="leading-relaxed text-[var(--text-secondary)]">
             The brand direction is minimal luxury: fewer distractions, better
             materials, strong product imagery, and a calm journey from discovery
-            to checkout. The SRS positions WOODLOOM as a direct-to-customer
+            to checkout. The SRS positions Shissoo as a direct-to-customer
             furniture platform with future readiness for stores, content,
             mobile apps, and admin operations.
           </p>

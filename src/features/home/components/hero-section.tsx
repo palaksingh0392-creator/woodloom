@@ -2,34 +2,76 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
-const slides = [
+import type { HomeHeroSlide } from "@/lib/home";
+
+const fallbackSlides: HomeHeroSlide[] = [
   {
-    id: 1,
-    image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85",
+    id: "fallback-1",
+    eyebrow: "Scandinavian Luxury Furniture",
+    title: "Timeless Furniture For Beautiful Living",
+    subtitle:
+      "Crafted wooden interiors inspired by warmth, simplicity, and modern luxury.",
+    imageUrl: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85",
+    primaryCtaLabel: "Explore Collection",
+    primaryCtaHref: "/furniture",
+    secondaryCtaLabel: "Book Consultation",
+    secondaryCtaHref: "/contact",
+    isActive: true,
+    sortOrder: 0,
   },
   {
-    id: 2,
-    image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85",
+    id: "fallback-2",
+    eyebrow: "Scandinavian Luxury Furniture",
+    title: "Timeless Furniture For Beautiful Living",
+    subtitle:
+      "Crafted wooden interiors inspired by warmth, simplicity, and modern luxury.",
+    imageUrl: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85",
+    primaryCtaLabel: "Explore Collection",
+    primaryCtaHref: "/furniture",
+    secondaryCtaLabel: "Book Consultation",
+    secondaryCtaHref: "/contact",
+    isActive: true,
+    sortOrder: 1,
   },
   {
-    id: 3,
-    image:
+    id: "fallback-3",
+    eyebrow: "Scandinavian Luxury Furniture",
+    title: "Timeless Furniture For Beautiful Living",
+    subtitle:
+      "Crafted wooden interiors inspired by warmth, simplicity, and modern luxury.",
+    imageUrl:
       "https://images.unsplash.com/photo-1497366754035-f200968a6e72?q=80&w=1600&auto=format&fit=crop&utm_source=chatgpt.com",
+    primaryCtaLabel: "Explore Collection",
+    primaryCtaHref: "/furniture",
+    secondaryCtaLabel: "Book Consultation",
+    secondaryCtaHref: "/contact",
+    isActive: true,
+    sortOrder: 2,
   },
 ];
 
-export default function HeroSection() {
+export default function HeroSection({ slides = fallbackSlides }: { slides?: HomeHeroSlide[] }) {
+  const safeSlides = useMemo(
+    () => (slides && slides.length > 0 ? slides : fallbackSlides),
+    [slides],
+  );
   const [currentSlide, setCurrentSlide] = useState(0);
 
   useEffect(() => {
+    if (safeSlides.length <= 1) {
+      return;
+    }
+
     const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev === slides.length - 1 ? 0 : prev + 1));
+      setCurrentSlide((prev) => (prev === safeSlides.length - 1 ? 0 : prev + 1));
     }, 5000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [safeSlides.length]);
+
+  const activeSlide = safeSlides[currentSlide] ?? safeSlides[0];
 
   return (
     <section
@@ -58,9 +100,9 @@ export default function HeroSection() {
       >
         {/* IMAGE CAROUSEL */}
         <div className="absolute inset-0">
-          {slides.map((slide, index) => (
+          {safeSlides.map((slide, index) => (
             <div
-              key={slide.id}
+              key={slide.id ?? `${slide.title}-${index}`}
               className={`
                 absolute
                 inset-0
@@ -73,8 +115,8 @@ export default function HeroSection() {
               `}
             >
               <Image
-                src={slide.image}
-                alt="Luxury Furniture"
+                src={slide.imageUrl}
+                alt={slide.title}
                 fill
                 sizes="100vw"
                 priority
@@ -104,8 +146,10 @@ export default function HeroSection() {
             absolute
             z-20
 
-            left-6
-            right-6
+            left-4
+            right-4
+            sm:left-6
+            sm:right-6
             lg:left-16
             lg:right-auto
             top-1/2
@@ -123,16 +167,16 @@ export default function HeroSection() {
               sm:mb-5
               lg:mb-8
 
-              text-[11px]
-              sm:text-[13px]
-              tracking-[0.22em]
-              sm:tracking-[0.35em]
+              text-[14px]
+              sm:text-[16px]
+              tracking-[0.18em]
+              sm:tracking-[0.26em]
               uppercase
 
               text-[var(--primary)]
             "
           >
-            Scandinavian Luxury Furniture
+            {activeSlide.eyebrow}
           </span>
 
           {/* TITLE */}
@@ -140,12 +184,12 @@ export default function HeroSection() {
             className="
               max-w-[11ch]
 
-              text-[40px]
+              text-[38px]
               max-[360px]:text-[34px]
-              min-[390px]:text-[44px]
-              sm:text-[64px]
-              lg:text-[85px]
-              leading-[0.92]
+              min-[390px]:text-[42px]
+              sm:text-[56px]
+              lg:text-[72px]
+              leading-[0.96]
               tracking-normal
 
               text-[var(--text-primary)]
@@ -157,7 +201,7 @@ export default function HeroSection() {
               fontFamily: "var(--font-heading)",
             }}
           >
-            Timeless Furniture For Beautiful Living
+            {activeSlide.title}
           </h1>
 
           {/* DESCRIPTION */}
@@ -177,20 +221,21 @@ export default function HeroSection() {
               lg:mb-12
             "
           >
-            Crafted wooden interiors inspired by warmth, simplicity, and modern
-            luxury.
+            {activeSlide.subtitle}
           </p>
 
           {/* BUTTONS */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 sm:gap-5">
+          <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:gap-5">
             <Link
-              href="/furniture"
+              href={activeSlide.primaryCtaHref}
               className="
                 inline-flex
-                min-h-14
+                min-h-12
+                w-full
+                sm:w-auto
                 lg:h-16
-                px-6
-                max-[360px]:px-5
+                px-5
+                sm:px-6
                 lg:px-10
                 items-center
                 justify-center
@@ -200,8 +245,9 @@ export default function HeroSection() {
                 bg-[var(--text-primary)]
                 text-[var(--background)]
 
-                text-[12px]
-                sm:text-[13px]
+                text-[11px]
+                sm:text-[12px]
+                lg:text-[13px]
                 tracking-[0.12em]
                 sm:tracking-[0.18em]
                 uppercase
@@ -212,17 +258,19 @@ export default function HeroSection() {
                 hover:scale-[1.02]
               "
             >
-              Explore Collection
+              {activeSlide.primaryCtaLabel}
             </Link>
 
             <Link
-              href="/contact"
+              href={activeSlide.secondaryCtaHref}
               className="
                 inline-flex
-                min-h-14
+                min-h-12
+                w-full
+                sm:w-auto
                 lg:h-16
-                px-6
-                max-[360px]:px-5
+                px-5
+                sm:px-6
                 lg:px-10
                 items-center
                 justify-center
@@ -235,8 +283,9 @@ export default function HeroSection() {
                 bg-[var(--surface-overlay)]/72
                 backdrop-blur-md
 
-                text-[12px]
-                sm:text-[13px]
+                text-[11px]
+                sm:text-[12px]
+                lg:text-[13px]
                 tracking-[0.12em]
                 sm:tracking-[0.18em]
                 uppercase
@@ -247,7 +296,7 @@ export default function HeroSection() {
                 hover:bg-[var(--surface)]
               "
             >
-              Book Consultation
+              {activeSlide.secondaryCtaLabel}
             </Link>
           </div>
 
@@ -262,9 +311,11 @@ export default function HeroSection() {
               lg:mt-16
             "
           >
-            {slides.map((_, index) => (
+            {safeSlides.map((_, index) => (
               <button
                 key={index}
+                type="button"
+                aria-label={`View slide ${index + 1}`}
                 onClick={() => setCurrentSlide(index)}
                 className="
                   flex

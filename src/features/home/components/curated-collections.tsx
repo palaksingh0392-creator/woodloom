@@ -2,54 +2,21 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useRef } from "react";
 
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
+import type { Swiper as SwiperType } from "swiper";
 
-import { ChevronRight } from "lucide-react";
+import type { CatalogCollectionCard } from "@/lib/catalog";
 
-const collections = [
-  {
-    title: "Living Room",
-    products: "12 Products",
-    href: "/furniture/living-room",
-    image:
-      "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?q=80&w=1200&auto=format&fit=crop",
-  },
+export default function CuratedCollections({
+  collections,
+}: {
+  collections: CatalogCollectionCard[];
+}) {
+  const swiperRef = useRef<SwiperType | null>(null);
 
-  {
-    title: "Bedroom",
-    products: "10 Products",
-    href: "/furniture/bedroom",
-    image:
-      "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?q=80&w=1200&auto=format&fit=crop",
-  },
-
-  {
-    title: "Dining Room",
-    products: "8 Products",
-    href: "/furniture/dining-room",
-    image:
-      "https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?q=80&w=1200&auto=format&fit=crop",
-  },
-
-  {
-    title: "Workspace",
-    products: "14 Products",
-    href: "/furniture/office",
-    image:
-      "https://images.unsplash.com/photo-1486946255434-2466348c2166?q=80&w=1200&auto=format&fit=crop",
-  },
-
-  {
-    title: "Luxury Decor",
-    products: "9 Products",
-    href: "/furniture/decor",
-    image:
-      "https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=1200&auto=format&fit=crop",
-  },
-];
-
-export default function CuratedCollections() {
   return (
     <section className="overflow-hidden border-t border-[var(--border)] py-16 sm:py-20">
       <div className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-10">
@@ -85,24 +52,38 @@ export default function CuratedCollections() {
             </h2>
           </div>
 
-          <Link
-            href="/furniture"
-            className="
-              hidden md:flex
-              items-center
-              gap-2
-              uppercase
-              tracking-[2px]
-              text-[13px]
-            "
-          >
-            View All Collections
-            <ChevronRight size={16} />
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link
+              href="/furniture"
+              className="hidden items-center gap-2 uppercase tracking-[2px] text-[13px] md:flex"
+            >
+              View All Collections
+              <ChevronRight size={16} />
+            </Link>
+            <button
+              type="button"
+              aria-label="View previous collections"
+              onClick={() => swiperRef.current?.slidePrev()}
+              className="hidden h-11 w-11 items-center justify-center rounded-full border bg-[var(--surface)] transition hover:border-[var(--primary)] md:flex"
+            >
+              <ChevronLeft size={19} />
+            </button>
+            <button
+              type="button"
+              aria-label="View more collections"
+              onClick={() => swiperRef.current?.slideNext()}
+              className="hidden h-11 w-11 items-center justify-center rounded-full border bg-[var(--surface)] transition hover:border-[var(--primary)] md:flex"
+            >
+              <ChevronRight size={19} />
+            </button>
+          </div>
         </div>
 
         {/* SWIPER */}
         <Swiper
+          onSwiper={(swiper) => {
+            swiperRef.current = swiper;
+          }}
           spaceBetween={16}
           grabCursor={true}
           slidesPerView={1.03}
@@ -116,11 +97,11 @@ export default function CuratedCollections() {
             },
 
             1024: {
-              slidesPerView: 4.2,
+              slidesPerView: 4.35,
             },
 
             1400: {
-              slidesPerView: 5,
+              slidesPerView: 5.25,
             },
           }}
           className="mobile-swiper-rail"
@@ -131,6 +112,9 @@ export default function CuratedCollections() {
                 href={item.href}
                 className="
                   block
+                  flex
+                  flex-col
+                  h-full
                   bg-[var(--surface-tinted)]
                   rounded-[18px]
                   overflow-hidden
@@ -154,10 +138,12 @@ export default function CuratedCollections() {
                 </div>
 
                 {/* CONTENT */}
-                <div className="p-5 text-center">
+                <div className="flex h-[160px] flex-col p-5 text-center">
                   <h3
                     className="
-                      text-[26px]
+                      line-clamp-2
+                      min-h-[58px]
+                      text-[24px]
                       max-[360px]:text-[22px]
                       mb-2
                       text-[var(--text-primary)]
@@ -169,7 +155,7 @@ export default function CuratedCollections() {
                     {item.title}
                   </h3>
 
-                  <p className="text-sm text-[var(--text-secondary)] mb-4">
+                  <p className="mb-4 text-sm text-[var(--text-secondary)]">
                     {item.products}
                   </p>
 

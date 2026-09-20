@@ -3,8 +3,8 @@ import PolicySection from "@/components/shared/policy-section";
 import StaticPage from "@/components/shared/static-page";
 
 export const metadata = {
-  title: "Privacy Policy | WOODLOOM",
-  description: "WOODLOOM privacy and data handling policy.",
+  title: "Privacy Policy | Shissoo",
+  description: "Shissoo privacy and data handling policy.",
 };
 
 export default function PrivacyPolicyPage() {

@@ -9,7 +9,7 @@ export async function POST(request: Request) {
     await subscribeToNewsletter(await request.json());
 
     return NextResponse.json({
-      message: "You are subscribed to WOODLOOM updates.",
+      message: "You are subscribed to Shissoo updates.",
     });
   } catch (error) {
     return NextResponse.json(

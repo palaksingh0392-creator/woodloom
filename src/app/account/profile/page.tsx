@@ -5,8 +5,8 @@ import { getAccountProfile } from "@/lib/account";
 import { requireCustomerSession } from "@/lib/session";
 
 export const metadata = {
-  title: "Profile | WOODLOOM",
-  description: "Manage your WOODLOOM profile details.",
+  title: "Profile | Shissoo",
+  description: "Manage your Shissoo profile details.",
 };
 
 export default async function AccountProfilePage() {

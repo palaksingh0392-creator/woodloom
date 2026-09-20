@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { getAccountProfile } from "@/lib/account";
 import { hasDatabaseUrl } from "@/lib/auth";
+import { normalizePhone } from "@/lib/account-validation";
 import { prisma } from "@/lib/prisma";
 import { getCurrentSession } from "@/lib/session";
 
@@ -36,11 +37,18 @@ export async function PATCH(request: Request) {
     phone?: string;
   };
   const name = body.name?.trim();
-  const phone = body.phone?.trim() || null;
+  const phone = body.phone?.trim() ? normalizePhone(body.phone) : null;
 
   if (!name) {
     return NextResponse.json(
       { message: "Full name is required." },
+      { status: 400 },
+    );
+  }
+
+  if (body.phone?.trim() && !phone) {
+    return NextResponse.json(
+      { message: "Enter a valid phone number with exactly 10 digits after +91." },
       { status: 400 },
     );
   }

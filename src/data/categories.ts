@@ -19,7 +19,7 @@ export const categories: Category[] = [
     description:
       "Warm lounge pieces, sofas, coffee tables, and accent seating designed for calm everyday living.",
     seoDescription:
-      "Shop premium wooden living room furniture from WOODLOOM, including sofas, lounge chairs, and coffee tables.",
+      "Shop premium wooden living room furniture from Shissoo, including sofas, lounge chairs, and coffee tables.",
     image:
       "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?q=80&w=1600&auto=format&fit=crop",
     productCategory: "Living Room",
@@ -67,11 +67,11 @@ export const categories: Category[] = [
   {
     slug: "decor",
     title: "Decor & Accent Furniture",
-    shortTitle: "Decor",
+    shortTitle: "Decor & Accent",
     description:
       "Accent tables, sculptural pieces, and finishing touches that bring texture to quiet interiors.",
     seoDescription:
-      "Browse luxury decor and accent furniture from WOODLOOM, including side tables and natural finishes.",
+      "Browse luxury decor and accent furniture from Shissoo, including side tables and natural finishes.",
     image:
       "https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=1600&auto=format&fit=crop",
     productCategory: "Decor",

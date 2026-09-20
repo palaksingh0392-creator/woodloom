@@ -5,8 +5,8 @@ import { listAccountOrders } from "@/lib/orders";
 import { requireCustomerSession } from "@/lib/session";
 
 export const metadata = {
-  title: "Orders | WOODLOOM",
-  description: "View your WOODLOOM order history.",
+  title: "Orders | Shissoo",
+  description: "View your Shissoo order history.",
 };
 
 export default async function AccountOrdersPage() {

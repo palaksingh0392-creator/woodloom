@@ -1,6 +1,8 @@
 import { Clock, MapPin, Phone } from "lucide-react";
 
-const stores = [
+import type { StoreLocation } from "@/lib/store-locations";
+
+const fallbackStores: Omit<StoreLocation, "id" | "isActive" | "sortOrder">[] = [
   {
     city: "Bengaluru Experience Studio",
     address: "Indiranagar, 100 Feet Road",
@@ -15,7 +17,16 @@ const stores = [
   },
 ];
 
-export default function StoreLocator() {
+export default function StoreLocator({ locations = [] }: { locations?: StoreLocation[] }) {
+  const stores = locations.length > 0 ? locations : fallbackStores.map((store, index) => ({
+    id: `fallback-store-${index}`,
+    city: store.city,
+    address: store.address,
+    phone: store.phone,
+    hours: store.hours,
+    isActive: true,
+    sortOrder: index,
+  }));
   return (
     <section className="border-t border-[var(--border)] py-16 lg:py-20">
       <div className="mx-auto max-w-[1440px] px-5 sm:px-6 lg:px-10">
@@ -39,7 +50,7 @@ export default function StoreLocator() {
             </p>
 
             <h2 className="mb-6 text-4xl leading-[1] sm:text-5xl">
-              Visit A WOODLOOM Space
+              Visit A Shissoo Space
             </h2>
 
             <p className="max-w-[460px] text-[17px] leading-relaxed text-[var(--text-secondary)]">

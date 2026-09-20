@@ -57,7 +57,7 @@ export async function uploadProductImage(file: File) {
   }
 
   const timestamp = Math.floor(Date.now() / 1000);
-  const folder = "woodloom/products";
+  const folder = "shissoo/products";
   const signature = createHash("sha1")
     .update(`folder=${folder}&timestamp=${timestamp}${apiSecret}`)
     .digest("hex");

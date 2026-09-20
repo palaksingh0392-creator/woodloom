@@ -13,7 +13,47 @@ const prisma = new PrismaClient({
   adapter: new PrismaMssql(databaseUrl),
 });
 
+const deliveryAreas = [
+  { state: "Delhi", city: "New Delhi", pincode: "110001", deliveryCharge: 999, estimatedDays: 7 },
+  { state: "Delhi", city: "Rohini", pincode: "110011", deliveryCharge: 999, estimatedDays: 7 },
+  { state: "Delhi", city: "Dwarka", pincode: "110076", deliveryCharge: 999, estimatedDays: 7 },
+  { state: "Rajasthan", city: "Jaipur", pincode: "302001", deliveryCharge: 999, estimatedDays: 7 },
+  { state: "Rajasthan", city: "Jodhpur", pincode: "342001", deliveryCharge: 999, estimatedDays: 7 },
+  { state: "Rajasthan", city: "Udaipur", pincode: "313001", deliveryCharge: 999, estimatedDays: 7 },
+  { state: "Rajasthan", city: "Kota", pincode: "324005", deliveryCharge: 999, estimatedDays: 7 },
+  { state: "Uttar Pradesh", city: "Noida", pincode: "201301", deliveryCharge: 999, estimatedDays: 7 },
+  { state: "Uttar Pradesh", city: "Ghaziabad", pincode: "201309", deliveryCharge: 999, estimatedDays: 7 },
+  { state: "Uttar Pradesh", city: "Lucknow", pincode: "226010", deliveryCharge: 999, estimatedDays: 7 },
+  { state: "Uttar Pradesh", city: "Kanpur", pincode: "282001", deliveryCharge: 999, estimatedDays: 7 },
+  { state: "Uttar Pradesh", city: "Varanasi", pincode: "221001", deliveryCharge: 999, estimatedDays: 7 },
+] as const;
+
 async function main() {
+  for (const area of deliveryAreas) {
+    await prisma.deliveryArea.upsert({
+      where: {
+        state_city_pincode: {
+          state: area.state,
+          city: area.city,
+          pincode: area.pincode,
+        },
+      },
+      update: {
+        deliveryCharge: area.deliveryCharge,
+        estimatedDays: area.estimatedDays,
+        isActive: true,
+      },
+      create: {
+        state: area.state,
+        city: area.city,
+        pincode: area.pincode,
+        deliveryCharge: area.deliveryCharge,
+        estimatedDays: area.estimatedDays,
+        isActive: true,
+      },
+    });
+  }
+
   for (const category of categories) {
     await prisma.category.upsert({
       where: { slug: category.slug },
